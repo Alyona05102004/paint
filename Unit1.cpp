@@ -1,6 +1,12 @@
 //---------------------------------------------------------------------------
 
 #include <vcl.h>
+
+#include <Vcl.Graphics.hpp>
+#include <Vcl.Imaging.jpeg.hpp>
+#include <System.IOUtils.hpp>
+#include <Vcl.Dialogs.hpp>
+
 #include <cmath>
 #pragma hdrstop
 
@@ -30,8 +36,82 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 
 void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y)
-{  PaintBox1->Canvas->Pen->Color = ColorBox1->Selected;
+{
+
+
+
+PaintBox1->Canvas->Pen->Color = ColorBox1->Selected;
 PaintBox1->Canvas->Brush->Color = ColorBox2->Selected;
+
+switch (ComboBox1->ItemIndex)
+	{
+		case 0: //PaintBox1->Canvas->Pen->Style = psSolid;   // Сплошная
+				if (cnt > 1){
+				PaintBox1->Canvas->MoveTo(points[cnt].X, points[cnt].Y);
+				PaintBox1->Canvas->LineTo(points[cnt+1].X, points[cnt+1].Y);
+				}
+				break;
+		case 1: //PaintBox1->Canvas->Pen->Style = psDash;    // Штрих
+				for (int i = X; i < X+100; i += 10) {
+					PaintBox1->Canvas->MoveTo(i, Y);
+					PaintBox1->Canvas->LineTo(i + 5, Y);
+				}
+				break;
+		case 2: //PaintBox1->Canvas->Pen->Style = psDashDot;     // ШтрихПунктирная
+				for (int i = X; i < X+100; i += 15) {
+				PaintBox1->Canvas->MoveTo(i, Y);
+				PaintBox1->Canvas->LineTo(i + 5, Y);
+				PaintBox1->Canvas->MoveTo(i + 10, Y);
+				PaintBox1->Canvas->LineTo(i + 10, Y + 2); // Рисуем точку
+            }
+				break;
+		case 3: //PaintBox1->Canvas->Pen->Style = psDot;     // Пунктирная
+				for (int i = X; i < X+100; i += 10) {
+					PaintBox1->Canvas->MoveTo(i, Y);
+					PaintBox1->Canvas->LineTo(i + 2, Y);
+				}
+				break;
+		case 4: // косая линия
+                PaintBox1->Canvas->MoveTo(X, Y);
+            	PaintBox1->Canvas->LineTo(X + 100, Y + 50);
+				break;
+		case 5: 	for (int i = 0; i < 10; i++) {      //зигзаг
+					PaintBox1->Canvas->MoveTo(X + i * 20, Y);
+					PaintBox1->Canvas->LineTo(X + (i + 1) * 20, Y + (i % 2 == 0 ? 20 : -20));
+				}
+				break;
+		case 6:  //волна
+				for (int i = 0; i < 100; i++) {
+					PaintBox1->Canvas->MoveTo(X + i, Y + (int)(10 * sin(i / 10.0)));
+					PaintBox1->Canvas->LineTo(X + i + 1, Y + (int)(10 * sin((i + 1) / 10.0)));
+				}
+				break;
+		case 7: PaintBox1->Canvas->Ellipse(X - 50, Y - 50, X + 50, Y + 50);     // из кругов
+				break;
+		case 8:  PaintBox1->Canvas->Rectangle(X - 50, Y - 50, X + 50, Y + 50);     // из квадратов
+				break;
+		case 9: for (int i = X; i < X+100; i += 15) {            //2 тире точка
+					PaintBox1->Canvas->MoveTo(i, Y);
+					PaintBox1->Canvas->LineTo(i + 5, Y);
+					PaintBox1->Canvas->MoveTo(i + 10, Y);
+					PaintBox1->Canvas->LineTo(i + 15, Y);
+					PaintBox1->Canvas->MoveTo(i + 20, Y);
+					PaintBox1->Canvas->LineTo(i + 25, Y+2);// Рисуем точку
+				}
+				break;
+		case 10: for (int i = X; i < X+100; i += 15) {       //10 пикселей, 5 пропуск, 5 пикселей, 5 пропуск...
+					PaintBox1->Canvas->MoveTo(i, Y);
+					PaintBox1->Canvas->LineTo(i + 10, Y);
+					PaintBox1->Canvas->MoveTo(i + 15, Y);
+					PaintBox1->Canvas->LineTo(i + 20, Y);
+				}
+				break;
+		case 11: PaintBox1->Canvas->Pen->Style = psDot;     //
+				break;
+		default: PaintBox1->Canvas->Pen->Style = psSolid;   // По умолчанию
+				break;
+	}
+	PaintBox1->Canvas->Pen->Width= TrackBar1->Position;
 //нажатие на мышь
 	if (draw==true) {
 		points[cnt] = Point(X, Y);
@@ -135,81 +215,54 @@ PaintBox1->Canvas->Brush->Color = ColorBox2->Selected;
 
 
 	if (draw_polyline==true) {
-		if(flag==5){
-			static int x_start=0;//points[cnt].X;
-			static int y_start=0;//points[cnt].Y;
-			if(!poly_first_point){
-                x_start=X;
-				y_start=Y;
-				points[cnt] = Point(X, Y);
-				PaintBox1->Canvas->MoveTo(x_start, y_start);
-				cnt++;
-				poly_first_point=true;
-                lastPoint.X = X;
-                lastPoint.Y = Y;
-			}
-			else{
-				points[cnt] = Point(X, Y);
-				int x_end=points[cnt].X;
-				int y_end=points[cnt].Y;
-				//PaintBox1->Canvas->MoveTo(x_start, y_start);
-				PaintBox1->Canvas->LineTo(x_end, y_end);
-				cnt++;
-				lastPoint.X=x_end;
-				lastPoint.Y=y_end;
-				//x_start=lastPoint.X;
-				//y_start=lastPoint.Y;
-			}
+		if (!poly_first_point)
+		{
+            // Начало полилинии
+			poly_first_point = true;
+			lastPoint.X = X;
+            lastPoint.Y = Y;
 		}
-		if(flag==6){
-		static int x_start=0;//points[cnt].X;
-		static int y_start=0;//points[cnt].Y;
-		static int x_end =0; //points[cnt].X;
-		static int y_end =0; //points[cnt].Y;
-		static int x2 = 0, y2 = 0;
-		static float step = 0.001;
-		static float u=0.0l;
-		static int num=0;
-			if(!poly_first_point){
-				x_start=X;
-				y_start=Y;
+		else{
+			if(flag==5){
+				points[cnt] = Point(X, Y);
+				PaintBox1->Canvas->MoveTo(lastPoint.X, lastPoint.Y);
+				PaintBox1->Canvas->LineTo(X, Y);
+				lastPoint.X=X;
+				lastPoint.Y=Y;
+				cnt++;
+			}
+			if(flag==6){
+			static int x1 = 0, y1 = 0;
+			static int x2 = 0, y2 = 0;
+			static float step = 0.001;
+			static float u=0.0l;
+			static int num=1;
+			if (num == 1) {
+				// Вторая точка
+				x2 = X;
+				y2 = Y;
 				points[cnt] = Point(X, Y);
 				cnt++;
-				PaintBox1->Canvas->Ellipse(x_start - 2, y_start - 2, x_start + 2, y_start + 2);
-				poly_first_point=true;
+				PaintBox1->Canvas->Ellipse(x2 - 2, y2 - 2, x2 + 2, y2 + 2);
+				num++;
+			}
+			else if (num == 2) {
+				// Третья точка
+				int x3 = X;
+				int y3 = Y;
+				points[cnt] = Point(X, Y);
+				cnt++;
+				PaintBox1->Canvas->Ellipse(x3 - 2, y3 - 2, x3 + 2, y3 + 2);
+				for (u = 0.0; u <= 1.0; u +=step) {
+					/*безье*/
+					int x=(1-u)*(1-u)*(1-u)*lastPoint.X+3*(1-u)*(1-u)*u*x2+3*u*u*(1-u)*x2+u*u*u*x3;
+					int y=(1-u)*(1-u)*(1-u)*lastPoint.Y+3*(1-u)*(1-u)*u*y2+3*u*u*(1-u)*y2 +u*u*u*y3;
+					PaintBox1->Canvas->Pixels[x][y] = ColorBox1->Selected;
+				}
                 lastPoint.X = X;
 				lastPoint.Y = Y;
 				num=1;
 			}
-			else{
-				if (num == 1) {
-					// Вторая точка
-					x2 = X;
-					y2 = Y;
-					points[cnt] = Point(X, Y);
-					cnt++;
-					PaintBox1->Canvas->Ellipse(x2 - 2, y2 - 2, x2 + 2, y2 + 2);
-					num++;
-				}
-				else if (num == 2) {
-					// Третья точка
-					x_end = X;
-					y_end = Y;
-					points[cnt] = Point(X, Y);
-					cnt++;
-					PaintBox1->Canvas->Ellipse(x_end - 2, y_end - 2, x_end + 2, y_end + 2);
-					for (u = 0.0; u <= 1.0; u +=step) {
-						/*безье*/
-						int x=(1-u)*(1-u)*(1-u)*x_start+3*(1-u)*(1-u)*u*x2+3*u*u*(1-u)*x2+u*u*u*x_end;
-						int y=(1-u)*(1-u)*(1-u)*y_start+3*(1-u)*(1-u)*u*y2+3*u*u*(1-u)*y2 +u*u*u*y_end;
-						PaintBox1->Canvas->Pixels[x][y] = ColorBox1->Selected;
-					}
-					num=1;
-					lastPoint.X=X;
-                    lastPoint.Y=Y;
-					x_start=lastPoint.X;
-					y_start=lastPoint.Y;
-				}
 			}
 		}
 	}
@@ -254,9 +307,8 @@ void __fastcall TForm1::RadioGroup1Click(TObject *Sender)
 
 void __fastcall TForm1::RadioGroup2Click(TObject *Sender)
 { flag=-1;
-	first_point=false;
-	poly_first_point=false;
-	RadioGroup1->ItemIndex=-1;
+first_point=false;
+RadioGroup1->ItemIndex=-1;
 	if (draw_polyline==true) {
 		if (RadioGroup2->ItemIndex==0){
 		//отрезок
@@ -301,6 +353,111 @@ RadioGroup2->Enabled=false;
 PaintBox1->Canvas->Pen->Color = clWhite;
 PaintBox1->Canvas->Brush->Color = clWhite;
 PaintBox1->Canvas->Rectangle(0, PaintBox1->Height, PaintBox1->Width,0);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button3Click(TObject *Sender)
+{   //сохранить
+ TBitmap *bmp = new TBitmap();
+	//TSaveDialog *saveDialog = new TSaveDialog(this); // Создаем SaveDialog
+
+    try {
+
+		SaveDialog1->Title = "Сохранить изображение";
+		SaveDialog1->DefaultExt = "bmp"; // Расширение по умолчанию
+		SaveDialog1->Filter = "JPEG Files (*.jpg;*.jpeg)|*.jpg;*.jpeg|All files (*.*)|*.*"; // Фильтры файлов
+		SaveDialog1->InitialDir = ExtractFilePath("C:\\Users\\user\Desktop\\"); // Начальная директория
+
+		// Показываем диалоговое окно
+		if (SaveDialog1->Execute()) {
+			bmp->Width = PaintBox1->Width;
+			bmp->Height = PaintBox1->Height;
+
+			bmp->Canvas->CopyRect(Rect(0, 0, PaintBox1->Width, PaintBox1->Height),
+								  PaintBox1->Canvas,
+								  Rect(0, 0, PaintBox1->Width, PaintBox1->Height));
+
+			// Сохраняем в зависимости от выбранного расширения
+			String filePath = SaveDialog1->FileName;
+			String fileExt = ExtractFileExt(filePath).LowerCase();
+
+			if (fileExt == ".bmp") {
+				bmp->SaveToFile(filePath);
+			} else if (fileExt == ".jpg" || fileExt == ".jpeg") {
+				TJPEGImage *jpg = new TJPEGImage();
+				try {
+					jpg->Assign(bmp);
+					jpg->CompressionQuality = 90;
+					jpg->SaveToFile(filePath);
+				} __finally {
+					delete jpg;
+				}
+			} else {
+				ShowMessage("Неподдерживаемый формат файла!");
+				return;
+			}
+
+			ShowMessage("Изображение сохранено!");
+		}
+
+	} catch (...) {
+		ShowMessage("Ошибка при сохранении изображения!");
+	}
+
+	delete bmp;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button4Click(TObject *Sender)
+{
+//открыть
+//TOpenDialog *openDialog = new TOpenDialog(this); // Создаем OpenDialog
+	TBitmap *bmp = new TBitmap(); // Создаем TBitmap
+
+	try {
+		// Настраиваем OpenDialog
+		OpenDialog1->Title = "Открыть изображение";
+		OpenDialog1->Filter = "JPEG Files (*.jpg;*.jpeg)|*.jpg;*.jpeg|All files (*.*)|*.*";
+		OpenDialog1->InitialDir = ExtractFilePath("C:\\Users\\user\Desktop\\");
+
+        // Показываем диалоговое окно
+		if (OpenDialog1->Execute()) {
+			String filePath = OpenDialog1->FileName;
+            String fileExt = ExtractFileExt(filePath).LowerCase();
+
+            try { // try-finally для bmp->LoadFromFile
+                if (fileExt == ".bmp") {
+                    bmp->LoadFromFile(filePath);
+                } else if (fileExt == ".jpg" || fileExt == ".jpeg") {
+                    TJPEGImage *jpg = new TJPEGImage();
+                    try {
+                        jpg->LoadFromFile(filePath);
+                        bmp->Assign(jpg);  // Конвертируем JPEG в Bitmap
+                    } __finally {
+                        delete jpg;
+                    }
+                } else {
+                    ShowMessage("Неподдерживаемый формат файла!");
+                    return;
+                }
+
+                // Отображаем изображение в PaintBox1
+                PaintBox1->Canvas->CopyRect(Rect(0, 0, PaintBox1->Width, PaintBox1->Height),
+                                             bmp->Canvas,
+                                             Rect(0, 0, bmp->Width, bmp->Height));
+
+            } __finally { // finally для bmp->LoadFromFile
+
+            }
+        }
+
+    } catch (...) {
+        ShowMessage("Ошибка при открытии изображения!");
+    }
+
+   // delete openDialog; // Освобождаем память
+	delete bmp; // Освобождаем память
 }
 //---------------------------------------------------------------------------
 

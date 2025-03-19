@@ -43,6 +43,11 @@ __published:	// IDE-managed Components
 	void __fastcall Button1Click(TObject *Sender);
 	void __fastcall Button5Click(TObject *Sender);
 	void __fastcall Button2Click(TObject *Sender);
+	void __fastcall Button3Click(TObject *Sender);
+	void __fastcall Button4Click(TObject *Sender);
+	//void __fastcall ComboBox1Change(TObject *Sender);
+	//void __fastcall ColorBox1Change(TObject *Sender);
+	//void __fastcall TrackBar1Change(TObject *Sender);
 
 private:	// User declarations
 public:		// User declarations
