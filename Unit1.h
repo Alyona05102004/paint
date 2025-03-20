@@ -35,7 +35,6 @@ __published:	// IDE-managed Components
 	TButton *Button5;
 	void __fastcall PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
 		  int X, int Y);
-	void __fastcall PaintBox1Paint(TObject *Sender);
 	void __fastcall RadioGroup1Click(TObject *Sender);
 	void __fastcall RadioGroup2Click(TObject *Sender);
 	void __fastcall Button1Click(TObject *Sender);
@@ -44,12 +43,11 @@ __published:	// IDE-managed Components
 	void __fastcall Button3Click(TObject *Sender);
 	void __fastcall Button4Click(TObject *Sender);
 	void __fastcall PaintBox1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
-
-	//void __fastcall ComboBox1Change(TObject *Sender);
-	//void __fastcall ColorBox1Change(TObject *Sender);
-	//void __fastcall TrackBar1Change(TObject *Sender);
+	void __fastcall FormCreate(TObject *Sender);
 
 private:	// User declarations
+ //TBitmap *DrawingBitmap; // Объект для хранения нарисованного изображения
+
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
 };

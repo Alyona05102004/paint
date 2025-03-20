@@ -10,6 +10,8 @@ object Form1: TForm1
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  WindowState = wsMaximized
+  OnCreate = FormCreate
   TextHeight = 15
   object PaintBox1: TPaintBox
     Left = 8
@@ -20,7 +22,6 @@ object Form1: TForm1
     ParentColor = False
     OnMouseDown = PaintBox1MouseDown
     OnMouseMove = PaintBox1MouseMove
-    OnPaint = PaintBox1Paint
   end
   object GroupBox1: TGroupBox
     Left = 872
