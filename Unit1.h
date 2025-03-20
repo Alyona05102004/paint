@@ -21,7 +21,6 @@ __published:	// IDE-managed Components
 	TComboBox *ComboBox1;
 	TColorBox *ColorBox1;
 	TTrackBar *TrackBar1;
-	TColorDialog *ColorDialog1;
 	TLabel *Label1;
 	TLabel *Label2;
 	TLabel *Label3;
@@ -46,7 +45,7 @@ __published:	// IDE-managed Components
 	void __fastcall FormCreate(TObject *Sender);
 
 private:	// User declarations
- //TBitmap *DrawingBitmap; // Объект для хранения нарисованного изображения
+ void __fastcall TForm1::DrawCustomLine(int x1, int y1, int x2, int y2);
 
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);

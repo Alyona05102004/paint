@@ -79,8 +79,9 @@ object Form1: TForm1
       Top = 335
       Width = 145
       Height = 23
+      ItemIndex = 0
       TabOrder = 3
-      Text = #1058#1080#1087' '#1083#1080#1085#1080#1080
+      Text = #1057#1087#1083#1086#1096#1085#1072#1103
       Items.Strings = (
         #1057#1087#1083#1086#1096#1085#1072#1103
         #1064#1090#1088#1080#1093
@@ -171,10 +172,6 @@ object Form1: TForm1
       TabOrder = 10
       OnClick = Button5Click
     end
-  end
-  object ColorDialog1: TColorDialog
-    Left = 144
-    Top = 719
   end
   object OpenDialog1: TOpenDialog
     Left = 16

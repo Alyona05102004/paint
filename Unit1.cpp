@@ -7,6 +7,7 @@
 #include <System.IOUtils.hpp>
 #include <Vcl.Dialogs.hpp>
 
+
 #include <cmath>
 #pragma hdrstop
 
@@ -24,7 +25,6 @@ bool draw_polyline=false;
 bool first_point=false;
 bool poly_first_point=false;
 bool lastik=false;
-TBitmap* DrawingBitmap = nullptr;
 TPoint points[100];
 TPoint lastPoint;
 int cnt=0;
@@ -36,12 +36,751 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 {
 }
 
+void __fastcall TForm1::DrawCustomLine(int x1, int y1, int x2, int y2){
+float length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+float k=0;
+int prev_x=0;
+int prev_y=0;
+int x=0;
+int y=0;
+int b=0;
+int propusk= TrackBar1->Position+1;
+	 switch (ComboBox1->ItemIndex) {
+		case 0:{ // Сплошная линия
+            PaintBox1->Canvas->Pen->Style = psSolid;
+			PaintBox1->Canvas->MoveTo(x1, y1);
+            PaintBox1->Canvas->LineTo(x2, y2);
+			break; // Добавляем break
+		 }
+		case 1:{ // Штрих линия
+
+		if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y =(int)(y1 + (x - x1) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (5+4+propusk);
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (5+4+propusk);
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x =(int)(x1 + (y - y1) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (5+4+propusk);
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x2 + (y - y2) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (5+4+propusk);
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+		case 2: // Штрих-пунктирная линия
+		 {if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y =(int)(y1 + (x - x1) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4 || b == (10+propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (10+2*propusk);
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4 || b == (7+propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (10+2*propusk);
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x =(int)(x1 + (y - y1) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4 || b == (7+propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (10+2*propusk);
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x2 + (y - y2) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4 || b == (7+propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (10+2*propusk);
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+		case 3: {// Пунктирная линия
+		{if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y =(int)(y1 + (x - x1) * k);
+					if (b == 0) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (2+propusk);
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k);
+					if (b == 0) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (2+propusk);
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x =(int)(x1 + (y - y1) * k);
+					if (b == 0) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (2+propusk);
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x2 + (y - y2) * k);
+					if (b == 0 ) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (2+propusk);
+				}
+			}
+		}
+		}
+			break;
+	}
+	case 4:{ // Кастомная линия 1 - 2 тире точка
+
+		if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y =(int)(y1 + (x - x1) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4 || b == (14+propusk) || b == (15+propusk) || b == (16+propusk) || b == (17+propusk) || b == (18+propusk) || b==(28+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (15+18+4*propusk);
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4 || b == (14+propusk) || b == (15+propusk) || b == (16+propusk) || b == (17+propusk) || b == (18+propusk) || b==(28+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (15+18+4*propusk);
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x =(int)(x1 + (y - y1) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4 || b == (14+propusk) || b == (15+propusk) || b == (16+propusk) || b == (17+propusk) || b == (18+propusk) || b==(28+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (15+18+4*propusk);
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x2 + (y - y2) * k);
+					if (b == 0 || b == 1 || b == 2 || b == 3 || b == 4 || b == (14+propusk) || b == (15+propusk) || b == (16+propusk) || b == (17+propusk) || b == (18+propusk) || b==(28+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (15+18+4*propusk);
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+        case 5:{ // Кастомная линия 2 - 2 точки тире
+
+		if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y =(int)(y1 + (x - x1) * k);
+					if (b == 0 || b == (5+propusk) || b == (10+2*propusk) || b == (11+2*propusk) || b == (12+2*propusk) || b == (13+2*propusk) || b == (14+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (18+4*propusk);
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k);
+					if (b == 0 || b == (5+propusk) || b == (10+2*propusk) || b == (11+2*propusk) || b == (12+2*propusk) || b == (13+2*propusk) || b == (14+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (18+4*propusk);
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x =(int)(x1 + (y - y1) * k);
+					if (b == 0 || b == (5+propusk) || b == (10+2*propusk) || b == (11+2*propusk) || b == (12+2*propusk) || b == (13+2*propusk) || b == (14+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (18+4*propusk);
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x2 + (y - y2) * k);
+					if (b == 0 || b == (5+propusk) || b == (10+2*propusk) || b == (11+2*propusk) || b == (12+2*propusk) || b == (13+2*propusk) || b == (14+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (18+3*propusk);
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+        case 6:{ // Кастомная линия 3 - длинное тире, короткое тире
+
+		if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y =(int)(y1 + (x - x1) * k);
+					if (b == 0 || b == 1 || b == 2 ||
+					b == 3 || b == 4 || b == 5 || b == 6 || b == 7 ||
+					b == 8 || b == 9 || b == (14+propusk) || b == (15+propusk) ||
+					b == (16+propusk) || b == (17+propusk) || b == (18+propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (23+2*propusk);
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k);
+					if (b == 0 || b == 1 || b == 2 ||
+					b == 3 || b == 4 || b == 5 || b == 6 || b == 7 ||
+					b == 8 || b == 9 || b == (14+propusk) || b == (15+propusk) ||
+					b == (16+propusk) || b == (17+propusk) || b == (18+propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (23+2*propusk);
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x =(int)(x1 + (y - y1) * k);
+					if (b == 0 || b == 1 || b == 2 ||
+					b == 3 || b == 4 || b == 5 || b == 6 || b == 7 ||
+					b == 8 || b == 9 || b == (14+propusk) || b == (15+propusk) ||
+					b == (16+propusk) || b == (17+propusk) || b == (18+propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (23+2*propusk);
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x2 + (y - y2) * k);
+					if (b == 0 || b == 1 || b == 2 ||
+					b == 3 || b == 4 || b == 5 || b == 6 || b == 7 ||
+					b == 8 || b == 9 || b == (14+propusk) || b == (15+propusk) ||
+					b == (16+propusk) || b == (17+propusk) || b == (18+propusk)) {
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (23+2*propusk);
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+		case 7:{ // Кастомная линия 4 - длинное тире,точка, короткое тире, точка
+
+		if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y =(int)(y1 + (x - x1) * k);
+					if (b == 0 || b == 1 || b == 2 ||
+					b == 3 || b == 4 || b == 5 || b == 6 || b == 7 ||
+					b == 8 || b == 9 || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (20+2*propusk) || b == (21+2*propusk) || b == (22+2*propusk) ||
+					b == (23+2*propusk) || b == (28+3*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (32+4*propusk);
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k);
+					if (b == 0 || b == 1 || b == 2 ||
+					b == 3 || b == 4 || b == 5 || b == 6 || b == 7 ||
+					b == 8 || b == 9 || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (20+2*propusk) || b == (21+2*propusk) || b == (22+2*propusk) ||
+					b == (23+2*propusk) || b == (28+3*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (32+4*propusk);
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x =(int)(x1 + (y - y1) * k);
+					if (b == 0 || b == 1 || b == 2 ||
+					b == 3 || b == 4 || b == 5 || b == 6 || b == 7 ||
+					b == 8 || b == 9 || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (20+2*propusk) || b == (21+2*propusk) || b == (22+2*propusk) ||
+					b == (23+2*propusk) || b == (28+3*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (32+4*propusk);
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x2 + (y - y2) * k);
+					if (b == 0 || b == 1 || b == 2 ||
+					b == 3 || b == 4 || b == 5 || b == 6 || b == 7 ||
+					b == 8 || b == 9 || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (20+2*propusk) || b == (21+2*propusk) || b == (22+2*propusk) ||
+					b == (23+2*propusk) || b == (28+3*propusk)) {
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (32+4*propusk);
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+		case 8:{ // Кастомная линия 5 - 1 точка, длинное тире, 2 точки, короткое тире
+
+		if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y =(int)(y1 + (x - x1) * k);
+					if (b == 0 || b == (5+propusk) || b == (6+propusk) ||
+					b == (7+propusk) || b == (8+propusk) || b == (9+propusk) || b == (10+propusk) || b == (11+propusk) ||
+					b == (12+propusk) || b == (13+propusk) || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (24+3*propusk) || b == (29+4*propusk) || b == (30+4*propusk) ||
+					b == (31+4*propusk) || b == (32+4*propusk) || b == (33+4*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (38+5*propusk);
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k);
+					if (b == 0 || b == (5+propusk) || b == (6+propusk) ||
+					b == (7+propusk) || b == (8+propusk) || b == (9+propusk) || b == (10+propusk) || b == (11+propusk) ||
+					b == (12+propusk) || b == (13+propusk) || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (24+3*propusk) || b == (29+4*propusk) || b == (30+4*propusk) ||
+					b == (31+4*propusk) || b == (32+4*propusk) || b == (33+4*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (38+5*propusk);
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x =(int)(x1 + (y - y1) * k);
+					if (b == 0 || b == (5+propusk) || b == (6+propusk) ||
+					b == (7+propusk) || b == (8+propusk) || b == (9+propusk) || b == (10+propusk) || b == (11+propusk) ||
+					b == (12+propusk) || b == (13+propusk) || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (24+3*propusk) || b == (29+4*propusk) || b == (30+4*propusk) ||
+					b == (31+4*propusk) || b == (32+4*propusk) || b == (33+4*propusk)) {
+						PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (38+5*propusk);
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x2 + (y - y2) * k);
+					if (b == 0 || b == (5+propusk) || b == (6+propusk) ||
+					b == (7+propusk) || b == (8+propusk) || b == (9+propusk) || b == (10+propusk) || b == (11+propusk) ||
+					b == (12+propusk) || b == (13+propusk) || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (24+3*propusk) || b == (29+4*propusk) || b == (30+4*propusk) ||
+					b == (31+4*propusk) || b == (32+4*propusk) || b == (33+4*propusk)) {
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					prev_x = x;
+					prev_y = y;
+					b = (b + 1) % (38+5*propusk);
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+
+        case 9:{ // Кастомная линия 6 - волна
+
+		if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y = (int)(y1 + (x - x1) * k + 10* sin(0.1 * (x - x1)));
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+					PaintBox1->Canvas->LineTo(x, y);
+                    prev_x = x;
+					prev_y = y;
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k + 10* sin(0.1 * (x - x2)));
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+					PaintBox1->Canvas->LineTo(x, y);
+                    prev_x = x;
+					prev_y = y;
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x = (int)(x1 + (y - y1) * k + 10 * sin(0.1 * (y - y1)));
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+					PaintBox1->Canvas->LineTo(x, y);
+					prev_x = x;
+					prev_y = y;
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x2 + (y - y2) * k + 10* sin(0.1 * (y - y2)));
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+					PaintBox1->Canvas->LineTo(x, y);
+					prev_x = x;
+					prev_y = y;
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+        case 10:{ // Кастомная линия 7 - зигзаг
+
+		if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x++) {
+					y = (int)(y1 + (x - x1) * k + 10* ((x / (10+2*propusk)) % 2 == 0 ? 1 : -1));
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+					PaintBox1->Canvas->LineTo(x, y);
+                    prev_x = x;
+					prev_y = y;
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x++) {
+					y = (int)(y2 + (x - x2) * k + 10 * ((x / (10+2*propusk)) % 2 == 0 ? 1 : -1));
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+					PaintBox1->Canvas->LineTo(x, y);
+                    prev_x = x;
+					prev_y = y;
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y++) {
+					x = (int)(x1 + (y - y1) * k + 10 * ((y / (10+2*propusk)) % 2 == 0 ? 1 : -1));
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+					PaintBox1->Canvas->LineTo(x, y);
+					prev_x = x;
+					prev_y = y;
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y++) {
+					x = (int)(x1 + (y - y1) * k + 10 * ((y / (10+2*propusk)) % 2 == 0 ? 1 : -1));
+					PaintBox1->Canvas->MoveTo(prev_x, prev_y);
+					PaintBox1->Canvas->LineTo(x, y);
+					prev_x = x;
+					prev_y = y;
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+
+		case 11:{ // Кастомная линия 8 - кружочки
+		int step=2*propusk;
+		if (abs(x2 - x1) >= abs(y2 - y1)) {
+			if (x2 > x1) {
+				k = (float)(y2 - y1) /(float)(x2 - x1);
+				prev_x = x1;
+				prev_y = y1;
+				for (x = x1; x <= x2; x+=step) {
+					int y = (int)(y1 + (x - x1) * k);
+					PaintBox1->Canvas->Ellipse(x - propusk, y - propusk, x + propusk, y + propusk);
+                    prev_x = x;
+					prev_y = y;
+				}
+			} else {
+				k = (float)(y1 - y2) /(float)(x1 - x2);
+				prev_x = x2;
+				prev_y = y2;
+				for (x = x2; x <= x1; x+=step) {
+					int y = (int)(y2 + (x - x2) * k);
+					PaintBox1->Canvas->Ellipse(x - propusk, y - propusk, x + propusk, y + propusk);
+                    prev_x = x;
+					prev_y = y;
+				}
+			}
+		} else {
+			if (y2 > y1) {
+				k = (float)(x2 - x1) / (float)(y2 - y1);
+				prev_x = x1;
+				prev_y = y1;
+				for (y = y1; y <= y2; y+=step) {
+					int x = (int)(x1 + (y - y1) * k);
+					PaintBox1->Canvas->Ellipse(x - propusk, y - propusk, x + propusk, y + propusk);
+					prev_x = x;
+					prev_y = y;
+				}
+			} else {
+				k = (float)(x1 - x2) / (float)(y1 - y2);
+				prev_x = x2;
+				prev_y = y2;
+				for (y = y2; y <= y1; y+=step) {
+					int x = (int)(x2 + (y - y2) * k);
+					PaintBox1->Canvas->Ellipse(x - propusk, y - propusk, x + propusk, y + propusk);
+					prev_x = x;
+					prev_y = y;
+				}
+			}
+		}
+			break; // Добавляем break
+		}
+}
+}
 void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
-          int X, int Y)
+		  int X, int Y)
 {     // Устанавливаем цвет пера и кисти
 	PaintBox1->Canvas->Pen->Color = ColorBox1->Selected;
 	PaintBox1->Canvas->Brush->Color = ColorBox2->Selected;
 	PaintBox1->Canvas->Pen->Width= TrackBar1->Position;
+
 
 	if (draw==true) {
 		points[cnt] = Point(X, Y);
@@ -60,11 +799,11 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 			}
 			else{
 				points[cnt] = Point(X, Y);
-				PaintBox1->Canvas->LineTo(points[cnt].X, points[cnt].Y);
+				DrawCustomLine(points[cnt - 1].X, points[cnt - 1].Y, points[cnt].X, points[cnt].Y); // Вызов функции рисования
 				cnt++;
 				first_point=false;
 			}
-        }
+		}
 		else if (flag==2){   //окружность
 			static int x_center=0;
 			static int y_center=0;
