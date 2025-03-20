@@ -37,7 +37,6 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 }
 
 void __fastcall TForm1::DrawCustomLine(int x1, int y1, int x2, int y2){
-float length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 float k=0;
 int prev_x=0;
 int prev_y=0;
@@ -816,9 +815,22 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 				}
 			else{
 				int radius = (sqrt(pow(x_center - X, 2) + pow(y_center - Y, 2)));
-				PaintBox1->Canvas->Ellipse(x_center - radius, y_center - radius, x_center + radius, y_center + radius);
-				cnt++;
-				first_point = false;
+                PaintBox1->Canvas->Ellipse(x_center - radius, y_center - radius, x_center + radius, y_center + radius);
+				/*for (int angle = 0; angle <= 360; angle++) {
+					// Вычисляем координаты текущей точки на окружности
+					int x1 = x_center + radius * cos(angle * M_PI / 180);
+					int y1 = y_center + radius * sin(angle * M_PI / 180);
+
+					// Рисуем линию от предыдущей точки к текущей
+					if (angle > 0) {
+						int x0 = x_center + radius * cos((angle - 1) * M_PI / 180);
+						int y0 = y_center + radius * sin((angle - 1) * M_PI / 180);
+						DrawCustomLine(x0, y0, x1, y1);
+            		}
+				}*/
+
+        cnt++;
+		first_point = false;
 			}
 		}
 		else if (flag==3){
@@ -875,7 +887,10 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 			}
 			else{
 				points[cnt] = Point(X, Y);
-				PaintBox1->Canvas->Rectangle(x_rec, y_rec, points[cnt].X, points[cnt].Y );
+				DrawCustomLine(x_rec, y_rec,  x_rec, Y);
+				DrawCustomLine(x_rec, Y, X, Y);
+				DrawCustomLine(X, Y, X, y_rec);
+				DrawCustomLine(X, y_rec, x_rec, y_rec);
 				cnt++;
                 first_point=false;
 			}
@@ -894,8 +909,8 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 		else{
 			if(flag==5){
 				points[cnt] = Point(X, Y);
-				PaintBox1->Canvas->MoveTo(lastPoint.X, lastPoint.Y);
-				PaintBox1->Canvas->LineTo(X, Y);
+				//PaintBox1->Canvas->MoveTo(lastPoint.X, lastPoint.Y);
+				DrawCustomLine(lastPoint.X, lastPoint.Y, X, Y);
 				lastPoint.X=X;
 				lastPoint.Y=Y;
 				cnt++;
