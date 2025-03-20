@@ -31,8 +31,6 @@ __published:	// IDE-managed Components
 	TButton *Button3;
 	TButton *Button4;
 	TGroupBox *GroupBox1;
-	TPanel *Panel1;
-	TPanel *Panel2;
 	TButton *Button1;
 	TButton *Button5;
 	void __fastcall PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
@@ -45,6 +43,8 @@ __published:	// IDE-managed Components
 	void __fastcall Button2Click(TObject *Sender);
 	void __fastcall Button3Click(TObject *Sender);
 	void __fastcall Button4Click(TObject *Sender);
+	void __fastcall PaintBox1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
+
 	//void __fastcall ComboBox1Change(TObject *Sender);
 	//void __fastcall ColorBox1Change(TObject *Sender);
 	//void __fastcall TrackBar1Change(TObject *Sender);

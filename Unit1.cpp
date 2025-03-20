@@ -31,7 +31,7 @@ int cnt=0;
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
-{
+{ PaintBox1->Color = clWhite;
 }
 
 void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
@@ -45,31 +45,31 @@ PaintBox1->Canvas->Brush->Color = ColorBox2->Selected;
 
 switch (ComboBox1->ItemIndex)
 	{
-		case 0: //PaintBox1->Canvas->Pen->Style = psSolid;   // Сплошная
-				if (cnt > 1){
+		case 0: PaintBox1->Canvas->Pen->Style = psSolid;   // Сплошная
+			   /*	if (cnt > 1){
 				PaintBox1->Canvas->MoveTo(points[cnt].X, points[cnt].Y);
 				PaintBox1->Canvas->LineTo(points[cnt+1].X, points[cnt+1].Y);
-				}
+				}*/
 				break;
-		case 1: //PaintBox1->Canvas->Pen->Style = psDash;    // Штрих
-				for (int i = X; i < X+100; i += 10) {
+		case 1: PaintBox1->Canvas->Pen->Style = psDash;    // Штрих
+			   /*	for (int i = X; i < X+100; i += 10) {
 					PaintBox1->Canvas->MoveTo(i, Y);
 					PaintBox1->Canvas->LineTo(i + 5, Y);
-				}
+				}  */
 				break;
-		case 2: //PaintBox1->Canvas->Pen->Style = psDashDot;     // ШтрихПунктирная
-				for (int i = X; i < X+100; i += 15) {
+		case 2: PaintBox1->Canvas->Pen->Style = psDashDot;     // ШтрихПунктирная
+				/*for (int i = X; i < X+100; i += 15) {
 				PaintBox1->Canvas->MoveTo(i, Y);
 				PaintBox1->Canvas->LineTo(i + 5, Y);
 				PaintBox1->Canvas->MoveTo(i + 10, Y);
 				PaintBox1->Canvas->LineTo(i + 10, Y + 2); // Рисуем точку
-            }
+			}      */
 				break;
-		case 3: //PaintBox1->Canvas->Pen->Style = psDot;     // Пунктирная
-				for (int i = X; i < X+100; i += 10) {
+		case 3: PaintBox1->Canvas->Pen->Style = psDot;     // Пунктирная
+				/*for (int i = X; i < X+100; i += 10) {
 					PaintBox1->Canvas->MoveTo(i, Y);
 					PaintBox1->Canvas->LineTo(i + 2, Y);
-				}
+				}    */
 				break;
 		case 4: // косая линия
                 PaintBox1->Canvas->MoveTo(X, Y);
@@ -113,6 +113,13 @@ switch (ComboBox1->ItemIndex)
 	}
 	PaintBox1->Canvas->Pen->Width= TrackBar1->Position;
 //нажатие на мышь
+	/* if (lastik) {
+		PaintBox1->Canvas->Pen->Color = clBtnFace;
+		PaintBox1->Canvas->Brush->Color = clBtnFace;
+        PaintBox1->Canvas->Ellipse(X - 10, Y - 10, X + 10, Y + 10); // Пример стирания
+        return;
+    }   */
+
 	if (draw==true) {
 		points[cnt] = Point(X, Y);
 		if (flag == 0) { // Точка
@@ -350,9 +357,6 @@ draw=false;
 draw_polyline=false;
 RadioGroup1->Enabled=false;
 RadioGroup2->Enabled=false;
-PaintBox1->Canvas->Pen->Color = clWhite;
-PaintBox1->Canvas->Brush->Color = clWhite;
-PaintBox1->Canvas->Rectangle(0, PaintBox1->Height, PaintBox1->Width,0);
 }
 //---------------------------------------------------------------------------
 
@@ -458,6 +462,18 @@ void __fastcall TForm1::Button4Click(TObject *Sender)
 
    // delete openDialog; // Освобождаем память
 	delete bmp; // Освобождаем память
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::PaintBox1MouseMove(TObject *Sender, TShiftState Shift, int X,
+          int Y)
+{
+if (lastik && Shift.Contains(ssLeft)) {
+PaintBox1->Canvas->Pen->Color = clBtnFace;
+		PaintBox1->Canvas->Brush->Color = clBtnFace;
+        PaintBox1->Canvas->Ellipse(X - 10, Y - 10, X + 10, Y + 10); // Пример стирания
+        return;
+}
 }
 //---------------------------------------------------------------------------
 
