@@ -66,6 +66,7 @@ object Form1: TForm1
       Width = 145
       Height = 22
       TabOrder = 1
+      OnChange = ColorBox1Change
     end
     object ColorBox2: TColorBox
       Left = 17
@@ -122,6 +123,7 @@ object Form1: TForm1
       Min = 1
       Position = 1
       TabOrder = 5
+      OnChange = TrackBar1Change
     end
     object RadioGroup2: TRadioGroup
       Left = 19

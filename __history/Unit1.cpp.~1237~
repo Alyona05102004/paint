@@ -1,0 +1,549 @@
+﻿//---------------------------------------------------------------------------
+
+#include <vcl.h>
+
+#include <Vcl.Graphics.hpp>
+#include <Vcl.Imaging.jpeg.hpp>
+#include <System.IOUtils.hpp>
+#include <Vcl.Dialogs.hpp>
+#include <windows.h>
+#include <cmath>
+#include <vector>
+#pragma hdrstop
+
+#include "Unit1.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+TForm1 *Form1;
+using namespace std;
+
+//глобальные переменные
+bool draw=false;
+int flag=-1;
+bool draw_polyline=false;
+bool first_point=false;
+bool poly_first_point=false;
+bool lastik=false;
+TPoint points[100];
+TPoint lastPoint;
+int cnt=0;
+
+
+//---------------------------------------------------------------------------
+__fastcall TForm1::TForm1(TComponent* Owner)
+	: TForm(Owner)
+{ CreatePens();
+
+
+DWORD penWidth= TrackBar1->Position+1;
+    LOGBRUSH logBrush;
+	logBrush.lbStyle = BS_SOLID; // Стиль кисти
+	logBrush.lbColor = ColorBox1->Selected; // Цвет кисти
+	logBrush.lbHatch = 0; // Не используется
+
+    // Создаем массивы для стилей
+    DWORD dashStyle1[] = { 5, 2, 5, 2, 1 };
+    DWORD dashStyle2[] = { 1, 2, 1, 2, 5 };
+    DWORD dashStyle3[] = { 10, 2, 5 };
+    DWORD dashStyle4[] = { 10, 2, 1, 2, 5, 2, 1 };
+    DWORD dashStyle5[] = { 1, 2, 10, 2, 1, 2, 1, 2, 5 };
+    DWORD dashStyle6[] = { 1, 2, 1, 2, 1, 2, 5, 2, 5 };
+    DWORD dashStyle7[] = { 5, 2, 1, 2, 5, 2, 10, 2 };
+	DWORD dashStyle8[] = { 5, 2, 1, 2, 5, 2, 1, 10, 2, 1 };
+
+	this->Pen1 = ExtCreatePen(PS_SOLID, penWidth, &logBrush, 0, nullptr);
+	this->Pen2 = ExtCreatePen(PS_DASH, penWidth, &logBrush, 0, nullptr);
+	this->Pen3 = ExtCreatePen(PS_DOT, penWidth, &logBrush, 0, nullptr);
+	this->Pen4 = ExtCreatePen(PS_DASHDOT, penWidth, &logBrush, 0, nullptr);
+	this->Pen5 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 5, dashStyle1);
+	this->Pen6 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 5, dashStyle2);
+	this->Pen7 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 3, dashStyle3);
+	this->Pen8 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 7, dashStyle4);
+	this->Pen9 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 9, dashStyle5);
+	this->Pen10 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 9, dashStyle6);
+	this->Pen11 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 8, dashStyle7);
+	this->Pen12 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 10, dashStyle8);
+
+}
+
+void __fastcall TForm1::CreatePens() {
+    DWORD penWidth= TrackBar1->Position+1;
+    LOGBRUSH logBrush;
+    logBrush.lbStyle = BS_SOLID; // Стиль кисти
+    logBrush.lbColor = ColorBox1->Selected; // Цвет кисти
+    logBrush.lbHatch = 0; // Не используется
+
+    // Создаем массивы для стилей
+    DWORD dashStyle1[] = { 5, 2, 5, 2, 1 };
+    DWORD dashStyle2[] = { 1, 2, 1, 2, 5 };
+    DWORD dashStyle3[] = { 10, 2, 5 };
+    DWORD dashStyle4[] = { 10, 2, 1, 2, 5, 2, 1 };
+    DWORD dashStyle5[] = { 1, 2, 10, 2, 1, 2, 1, 2, 5 };
+    DWORD dashStyle6[] = { 1, 2, 1, 2, 1, 2, 5, 2, 5 };
+    DWORD dashStyle7[] = { 5, 2, 1, 2, 5, 2, 10, 2 };
+	DWORD dashStyle8[] = { 5, 2, 1, 2, 5, 2, 1, 10, 2, 1 };
+
+	DeleteObject(Pen1);
+	DeleteObject(Pen2);
+    DeleteObject(Pen3);
+	DeleteObject(Pen4);
+	DeleteObject(Pen5);
+	DeleteObject(Pen6);
+	DeleteObject(Pen7);
+	DeleteObject(Pen8);
+	DeleteObject(Pen9);
+	DeleteObject(Pen10);
+	DeleteObject(Pen11);
+	DeleteObject(Pen12);
+
+    Pen1 = ExtCreatePen(PS_SOLID, penWidth, &logBrush, 0, nullptr);
+    Pen2 = ExtCreatePen(PS_DASH, penWidth, &logBrush, 0, nullptr);
+    Pen3 = ExtCreatePen(PS_DOT, penWidth, &logBrush, 0, nullptr);
+    Pen4 = ExtCreatePen(PS_DASHDOT, penWidth, &logBrush, 0, nullptr);
+    Pen5 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 5, dashStyle1);
+    Pen6 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 5, dashStyle2);
+    Pen7 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 3, dashStyle3);
+    Pen8 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 7, dashStyle4);
+    Pen9 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 9, dashStyle5);
+    Pen10 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 9, dashStyle6);
+    Pen11 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 8, dashStyle7);
+    Pen12 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 10, dashStyle8);
+}
+
+
+void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
+		  int X, int Y)
+{   // Получаем DC для PaintBox
+	HDC hdc = GetDC(PaintBox1->Parent->Handle);
+
+	HPEN oldPen;
+
+    // Устанавливаем цвет пера и кисти
+	LOGBRUSH logBrush;
+	logBrush.lbStyle = BS_SOLID; // Стиль кисти
+	logBrush.lbColor = ColorBox1->Selected; // Цвет кисти
+	logBrush.lbHatch = 0; // Не используется
+
+	// Redraw Pens on any of these events
+	CreatePens();
+	switch (ComboBox1->ItemIndex) {
+		case 0:
+			oldPen = (HPEN)SelectObject(hdc, Pen1);
+			break;
+		case 1:
+			oldPen = (HPEN)SelectObject(hdc, Pen2);
+			break;
+		case 2:
+			oldPen = (HPEN)SelectObject(hdc, Pen3);
+			break;
+		case 3:
+			oldPen = (HPEN)SelectObject(hdc, Pen4);
+			break;
+		case 4:
+			oldPen = (HPEN)SelectObject(hdc, Pen5);
+			break;
+		case 5:
+			oldPen = (HPEN)SelectObject(hdc, Pen6);
+			break;
+		case 6:
+			oldPen = (HPEN)SelectObject(hdc, Pen7);
+			break;
+		case 7:
+			oldPen = (HPEN)SelectObject(hdc, Pen8);
+			break;
+		case 8:
+			oldPen = (HPEN)SelectObject(hdc, Pen9);
+			break;
+		case 9:
+			oldPen = (HPEN)SelectObject(hdc, Pen10);
+			break;
+		case 10:
+			oldPen = (HPEN)SelectObject(hdc, Pen11);
+			break;
+		case 11:
+			oldPen = (HPEN)SelectObject(hdc, Pen12);
+			break;
+	}
+
+if (draw==true) {
+        points[cnt] = Point(X, Y);
+        if (flag == 0) { // Точка
+            Ellipse(hdc, points[cnt].X - 2, points[cnt].Y - 2, points[cnt].X + 2, points[cnt].Y + 2);
+            cnt++;
+        }
+        else if (flag==1) { // Отрезок
+            if (!first_point) {
+                points[cnt] = Point(X, Y);
+                MoveToEx(hdc, points[cnt].X, points[cnt].Y, nullptr);
+                cnt++;
+                first_point=true;
+            }
+            else{
+                points[cnt] = Point(X, Y);
+                MoveToEx(hdc, points[cnt-1].X, points[cnt-1].Y, nullptr); // Перемещаем перо к предыдущей точке
+                LineTo(hdc, points[cnt].X, points[cnt].Y); // Рисуем линию к текущей точке
+                cnt++;
+                first_point=false;
+            }
+        }
+        else if (flag==2){   //окружность
+            static int x_center=0;
+            static int y_center=0;
+            if (!first_point) {
+                x_center = X;
+                y_center = Y;
+                points[cnt] = Point(x_center, y_center);
+                cnt++;
+                first_point=true;
+                }
+            else{
+                int radius = (sqrt(pow(x_center - X, 2) + pow(y_center - Y, 2)));
+                Ellipse(hdc, x_center - radius, y_center - radius, x_center + radius, y_center + radius);
+                cnt++;
+                first_point = false;
+            }
+        }
+        else if (flag==3){
+        //дуга
+            static int x1 = 0, y1 = 0;
+            static int x2 = 0, y2 = 0;
+            static float step = 0.001;
+            static float u=0.0l;
+            static int num=0;
+            if (num == 0) {
+                // Первая точка
+                x1 = X;
+                y1 = Y;
+                points[cnt] = Point(X, Y);
+                cnt++;
+                Ellipse(hdc, x1 - 2, y1 - 2, x1 + 2, y1 + 2);
+                num++;
+            }
+            else if (num == 1) {
+                // Вторая точка
+                x2 = X;
+                y2 = Y;
+                points[cnt] = Point(X, Y);
+                cnt++;
+                //PaintBox1->Canvas->Ellipse(x2 - 2, y2 - 2, x2 + 2, y2 + 2);
+                num++;
+            }
+            else if (num == 2) {
+                // Третья точка
+                int x3 = X;
+                int y3 = Y;
+                points[cnt] = Point(X, Y);
+                cnt++;
+                Ellipse(hdc, x3 - 2, y3 - 2, x3 + 2, y3 + 2);
+                for (u = 0.0; u <= 1.0; u +=step) {
+                    int x=(1-u)*(1-u)*(1-u)*x1+3*(1-u)*(1-u)*u*x2+3*u*u*(1-u)*x2+u*u*u*x3;
+                    int y=(1-u)*(1-u)*(1-u)*y1+3*(1-u)*(1-u)*u*y2+3*u*u*(1-u)*y2 +u*u*u*y3;
+                    Ellipse(hdc, x - 2, y - 2, x + 2, y+ 2);
+                }
+                num = 0; // Сбросим номер для следующего рисования
+            }
+        }
+        else if (flag==4){
+            //прямоугольник
+            static int x_rec=0;
+            static int y_rec=0;
+            if (!first_point) {
+                points[cnt] = Point(X, Y);
+                x_rec=points[cnt].X;
+                y_rec=points[cnt].Y;
+                cnt++;
+                first_point=true;
+            }
+            else{
+                points[cnt] = Point(X, Y);
+                Rectangle(hdc, x_rec, y_rec, points[cnt].X, points[cnt].Y);
+                cnt++;
+                first_point=false;
+            }
+        }
+    }
+
+
+    if (draw_polyline==true) {
+        if (!poly_first_point)
+        {
+            // Начало полилинии
+            poly_first_point = true;
+            lastPoint.X = X;
+            lastPoint.Y = Y;
+        }
+        else{
+            if(flag==5){
+                points[cnt] = Point(X, Y);
+                MoveToEx(hdc, lastPoint.X, lastPoint.Y, nullptr); // Переместить перо к предыдущей точке
+                LineTo(hdc, X,Y); // Нарисовать линию к текущей точке
+                lastPoint.X=X;
+                lastPoint.Y=Y;
+                cnt++;
+            }
+            if(flag==6){
+            static int x1 = 0, y1 = 0;
+            static int x2 = 0, y2 = 0;
+            static float step = 0.001;
+            static float u=0.0l;
+            static int num=1;
+            if (num == 1) {
+                // Вторая точка
+                x2 = X;
+                y2 = Y;
+                points[cnt] = Point(X, Y);
+                cnt++;
+                //PaintBox1->Canvas->Ellipse(x2 - 2, y2 - 2, x2 + 2, y2 + 2);
+                num++;
+            }
+            else if (num == 2) {
+                // Третья точка
+                int x3 = X;
+                int y3 = Y;
+                points[cnt] = Point(X, Y);
+                cnt++;
+                Ellipse(hdc, x3 - 2, y3 - 2, x3 + 2, y3 + 2);
+                for (u = 0.0; u <= 1.0; u +=step) {
+                    int x=(1-u)*(1-u)*(1-u)*lastPoint.X+3*(1-u)*(1-u)*u*x2+3*u*u*(1-u)*x2+u*u*u*x3;
+                    int y=(1-u)*(1-u)*(1-u)*lastPoint.Y+3*(1-u)*(1-u)*u*y2+3*u*u*(1-u)*y2 +u*u*u*y3;
+                    Ellipse(hdc, x - 2, y - 2, x + 2, y+ 2);
+                }
+                lastPoint.X = X;
+                lastPoint.Y = Y;
+                num=1;
+            }
+            }
+        }
+    }
+	SelectObject(hdc, oldPen);
+	ReleaseDC(PaintBox1->Parent->Handle, hdc);
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm1::RadioGroup1Click(TObject *Sender)
+{ flag=-1;
+	first_point=false;
+	poly_first_point=false;
+	RadioGroup2->ItemIndex=-1;
+ if (draw==true) {
+	if (RadioGroup1->ItemIndex==0) {
+	//точка
+	flag=0;
+	}
+	else if (RadioGroup1->ItemIndex==1){
+	//отрезок
+	flag=1;
+	}
+	else if (RadioGroup1->ItemIndex==2){
+	//окружность
+	flag=2;
+	}
+	else if (RadioGroup1->ItemIndex==3){
+	//дуга
+	flag=3;
+	}
+	else{
+	//прямоугольник
+	flag=4;
+	}
+  }
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::RadioGroup2Click(TObject *Sender)
+{ flag=-1;
+first_point=false;
+RadioGroup1->ItemIndex=-1;
+	if (draw_polyline==true) {
+		if (RadioGroup2->ItemIndex==0){
+		//отрезок
+			flag=5;
+		}
+		else{
+		//дуга
+			flag=6;
+		}
+  }
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button1Click(TObject *Sender)
+{draw_polyline=false;
+draw=true;
+RadioGroup1->Enabled=true;
+RadioGroup2->Enabled=false;
+RadioGroup2->ItemIndex=-1;
+lastik=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button5Click(TObject *Sender)
+{  draw=false;
+   draw_polyline=true;
+   RadioGroup2->Enabled=true;
+   RadioGroup1->Enabled=false;
+   RadioGroup1->ItemIndex=-1;
+   lastik=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button2Click(TObject *Sender)
+{
+lastik=true;
+draw=false;
+draw_polyline=false;
+RadioGroup1->Enabled=false;
+RadioGroup2->Enabled=false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button3Click(TObject *Sender)
+{   //сохранить
+ TBitmap *bmp = new TBitmap();
+	//TSaveDialog *saveDialog = new TSaveDialog(this); // Создаем SaveDialog
+
+    try {
+
+		SaveDialog1->Title = "Сохранить изображение";
+		SaveDialog1->DefaultExt = "bmp"; // Расширение по умолчанию
+		SaveDialog1->Filter = "JPEG Files (*.jpg;*.jpeg)|*.jpg;*.jpeg|All files (*.*)|*.*"; // Фильтры файлов
+		SaveDialog1->InitialDir = ExtractFilePath("C:\\Users\\user\Desktop\\"); // Начальная директория
+
+		// Показываем диалоговое окно
+		if (SaveDialog1->Execute()) {
+			bmp->Width = PaintBox1->Width;
+			bmp->Height = PaintBox1->Height;
+
+			bmp->Canvas->CopyRect(Rect(0, 0, PaintBox1->Width, PaintBox1->Height),
+								  PaintBox1->Canvas,
+								  Rect(0, 0, PaintBox1->Width, PaintBox1->Height));
+
+			// Сохраняем в зависимости от выбранного расширения
+			String filePath = SaveDialog1->FileName;
+			String fileExt = ExtractFileExt(filePath).LowerCase();
+
+			if (fileExt == ".bmp") {
+				bmp->SaveToFile(filePath);
+			} else if (fileExt == ".jpg" || fileExt == ".jpeg") {
+				TJPEGImage *jpg = new TJPEGImage();
+				try {
+					jpg->Assign(bmp);
+					jpg->CompressionQuality = 90;
+					jpg->SaveToFile(filePath);
+				} __finally {
+					delete jpg;
+				}
+			} else {
+				ShowMessage("Неподдерживаемый формат файла!");
+				return;
+			}
+
+			ShowMessage("Изображение сохранено!");
+		}
+
+	} catch (...) {
+		ShowMessage("Ошибка при сохранении изображения!");
+	}
+
+	delete bmp;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button4Click(TObject *Sender)
+{
+//открыть
+//TOpenDialog *openDialog = new TOpenDialog(this); // Создаем OpenDialog
+	TBitmap *bmp = new TBitmap(); // Создаем TBitmap
+
+	try {
+		// Настраиваем OpenDialog
+		OpenDialog1->Title = "Открыть изображение";
+		OpenDialog1->Filter = "JPEG Files (*.jpg;*.jpeg)|*.jpg;*.jpeg|All files (*.*)|*.*";
+		OpenDialog1->InitialDir = ExtractFilePath("C:\\Users\\user\Desktop\\");
+
+        // Показываем диалоговое окно
+		if (OpenDialog1->Execute()) {
+			String filePath = OpenDialog1->FileName;
+            String fileExt = ExtractFileExt(filePath).LowerCase();
+
+            try { // try-finally для bmp->LoadFromFile
+                if (fileExt == ".bmp") {
+                    bmp->LoadFromFile(filePath);
+                } else if (fileExt == ".jpg" || fileExt == ".jpeg") {
+                    TJPEGImage *jpg = new TJPEGImage();
+                    try {
+                        jpg->LoadFromFile(filePath);
+                        bmp->Assign(jpg);  // Конвертируем JPEG в Bitmap
+                    } __finally {
+                        delete jpg;
+                    }
+                } else {
+                    ShowMessage("Неподдерживаемый формат файла!");
+                    return;
+                }
+
+                // Отображаем изображение в PaintBox1
+                PaintBox1->Canvas->CopyRect(Rect(0, 0, PaintBox1->Width, PaintBox1->Height),
+                                             bmp->Canvas,
+                                             Rect(0, 0, bmp->Width, bmp->Height));
+
+            } __finally { // finally для bmp->LoadFromFile
+
+            }
+        }
+
+    } catch (...) {
+        ShowMessage("Ошибка при открытии изображения!");
+    }
+
+   // delete openDialog; // Освобождаем память
+	delete bmp; // Освобождаем память
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::PaintBox1MouseMove(TObject *Sender, TShiftState Shift, int X,
+		  int Y)
+{
+
+if (lastik && Shift.Contains(ssLeft)) {
+PaintBox1->Canvas->Pen->Color = clBtnFace;
+		PaintBox1->Canvas->Brush->Color = clBtnFace;
+		PaintBox1->Canvas->Ellipse(X - 10, Y - 10, X + 10, Y + 10); // Пример стирания
+        return;
+}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::FormCreate(TObject *Sender)
+{
+    // Установите размеры формы на весь экран
+    this->Width = Screen->Width;
+    this->Height = Screen->Height;
+
+    // Установите размеры PaintBox1 и GroupBox1
+    PaintBox1->Width = ClientWidth - (GroupBox1->Width) - 10;
+	PaintBox1->Height = ClientHeight-10;
+    GroupBox1->Left = ClientWidth - (GroupBox1->Width);
+    GroupBox1->Height = ClientHeight-10;
+}
+//---------------------------------------------------------------------------
+
+__fastcall TForm1::~TForm1() {
+	DeleteObject(Pen1);
+	DeleteObject(Pen2);
+    DeleteObject(Pen3);
+	DeleteObject(Pen4);
+	DeleteObject(Pen5);
+	DeleteObject(Pen6);
+	DeleteObject(Pen7);
+	DeleteObject(Pen8);
+	DeleteObject(Pen9);
+	DeleteObject(Pen10);
+	DeleteObject(Pen11);
+	DeleteObject(Pen12);
+}
