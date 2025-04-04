@@ -6,9 +6,8 @@
 #include <Vcl.Imaging.jpeg.hpp>
 #include <System.IOUtils.hpp>
 #include <Vcl.Dialogs.hpp>
-
-
 #include <cmath>
+#include <vector>
 #pragma hdrstop
 
 #include "Unit1.h"
@@ -29,14 +28,144 @@ TPoint points[100];
 TPoint lastPoint;
 int cnt=0;
 
-
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
 {
 }
 
-void __fastcall TForm1::DrawCustomLine(int x1, int y1, int x2, int y2, int propusk){
+void __fastcall TForm1::DrawCustomEllipse(int xc, int yc, int r, float startAngleRad, float endAngleRad, int pattern){
+	float ugol=startAngleRad;
+	float step_ugol=1.0f/r; // Увеличил точность, float
+	int xp=0;
+	int yp=0;
+	int b=0;
+	int x=0;
+	int y=0;
+	int propusk= TrackBar1->Position+1;
+	while (ugol<=endAngleRad){
+		x=xc+sin(ugol)*r;
+		y=yc+cos(ugol)*r;
+		if (x!=xp || y!=yp) {
+			switch (pattern) {
+				case 0:{//сплошная
+					PaintBox1->Canvas->MoveTo(xp, yp);
+					PaintBox1->Canvas->LineTo(x, y);
+					break;
+				}
+				case 1:{//штрих линия
+					if (b<5) {
+						PaintBox1->Canvas->MoveTo(xp, yp);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					b+=1;
+					if((b+1)%(5+4+propusk)) b=0;
+					break;
+				}
+				case 2:{//штрих-пунктирная линия
+					if (b<5 || b==10+propusk) {
+						PaintBox1->Canvas->MoveTo(xp, yp);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					b+=1;
+					if((b+1)%(10+2*propusk)) b=0;
+					break;
+				}
+				case 3:{//Пунктирная линия
+					if (b == 0) {
+						PaintBox1->Canvas->MoveTo(xp, yp);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					b+=1;
+					if((b+1)%(2+propusk)) b=0;
+					break;
+				}
+				case 4:{//Кастомная линия 1 - 2 тире точка
+					if (b <5 || b == (14+propusk) || b == (15+propusk)
+					|| b == (16+propusk) || b == (17+propusk) || b == (18+propusk) || b==(28+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(xp, yp);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					b+=1;
+					if((b+1)%(15+18+4*propusk)) b=0;
+					break;
+				}
+                case 5:{//Кастомная линия 2 - 2 точки тире
+					if (b == 0 || b == (5+propusk) || b == (10+2*propusk)
+				|| b == (11+2*propusk) || b == (12+2*propusk) || b == (13+2*propusk) || b == (14+2*propusk)) {
+						PaintBox1->Canvas->MoveTo(xp, yp);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					b+=1;
+					if((b+1)%(18+4*propusk)) b=0;
+					break;
+				}
+				case 6:{//Кастомная линия 3 - длинное тире, короткое тире
+					if (b<10 || b == (14+propusk) || b == (15+propusk) ||
+					b == (16+propusk) || b == (17+propusk) || b == (18+propusk)) {
+						PaintBox1->Canvas->MoveTo(xp, yp);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					b+=1;
+					if((b+1)%(23+2*propusk)) b=0;
+					break;
+				}
+				case 7:{//Кастомная линия 4 - длинное тире,точка, короткое тире, точка
+					if (b<10 || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (20+2*propusk) || b == (21+2*propusk) || b == (22+2*propusk) ||
+					b == (23+2*propusk) || b == (28+3*propusk)) {
+						PaintBox1->Canvas->MoveTo(xp, yp);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					b+=1;
+					if((b+1)%(32+4*propusk)) b=0;
+					break;
+				}
+                case 8:{//Кастомная линия 5 - 1 точка, длинное тире, 2 точки, короткое тире
+					if (b == 0 || b == (5+propusk) || b == (6+propusk) ||
+					b == (7+propusk) || b == (8+propusk) || b == (9+propusk) || b == (10+propusk) || b == (11+propusk) ||
+					b == (12+propusk) || b == (13+propusk) || b == (14+propusk) || b == (19+2*propusk) ||
+					b == (24+3*propusk) || b == (29+4*propusk) || b == (30+4*propusk) ||
+					b == (31+4*propusk) || b == (32+4*propusk) || b == (33+4*propusk)) {
+						PaintBox1->Canvas->MoveTo(xp, yp);
+						PaintBox1->Canvas->LineTo(x, y);
+					}
+					b+=1;
+					if((b+1)%(38+5*propusk)) b=0;
+					break;
+				}
+                case 9: { // Кастомная линия 6 - волна
+					// Рисуем волну
+					int waveAmplitude = 10; // Амплитуда волны
+					int waveLength = 20; // Длина волны
+					int waveOffset = static_cast<int>(waveAmplitude * sin((ugol - startAngleRad) * waveLength));
+					Canvas->Pixels[x][y + waveOffset] = Canvas->Pen->Color;
+					break;
+				}
+				case 10: { // Кастомная линия 7 - зигзаг
+					int zigzagAmplitude = 10; // Амплитуда зигзага
+					int zigzagFrequency = 10; // Частота зигзага
+					int zigzagOffset = static_cast<int>(zigzagAmplitude * ((static_cast<int>(ugol * 10) / zigzagFrequency) % 2 == 0 ? 1 : -1));
+					Canvas->Pixels[x][y + zigzagOffset] = Canvas->Pen->Color;
+					break;
+				}
+            	case 11: { // Кастомная линия 8 - кружочки
+					int step = 2 * propusk;
+					if (static_cast<int>(ugol * 10) % step == 0) {
+						Canvas->Ellipse(x - propusk, y - propusk, x + propusk, y + propusk);
+					}
+					break;
+				}
+
+			}
+		}
+        xp=x;
+		yp=y;
+		ugol+=step_ugol;
+	}
+}
+
+void __fastcall TForm1::DrawCustomLine(int x1, int y1, int x2, int y2, int pattern){
 float k=0;
 int prev_x=0;
 int prev_y=0;
@@ -48,7 +177,7 @@ int propusk= TrackBar1->Position+1;
 		case 0:{ // Сплошная линия
             PaintBox1->Canvas->Pen->Style = psSolid;
 			PaintBox1->Canvas->MoveTo(x1, y1);
-            PaintBox1->Canvas->LineTo(x2, y2);
+			PaintBox1->Canvas->LineTo(x2, y2);
 			break; // Добавляем break
 		 }
 		case 1:{ // Штрих линия
@@ -798,7 +927,7 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 			}
 			else{
 				points[cnt] = Point(X, Y);
-				DrawCustomLine(points[cnt - 1].X, points[cnt - 1].Y, points[cnt].X, points[cnt].Y, (TrackBar1->Position+1)); // Вызов функции рисования
+				DrawCustomLine(points[cnt - 1].X, points[cnt - 1].Y, points[cnt].X, points[cnt].Y, ComboBox1->ItemIndex); // Вызов функции рисования
 				cnt++;
 				first_point=false;
 			}
@@ -815,20 +944,11 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 				}
 			else{
 				int radius = (sqrt(pow(x_center - X, 2) + pow(y_center - Y, 2)));
-				for (int angle = 0; angle <= 360; angle++) {
-					// Вычисляем координаты текущей точки на окружности
-					int x1 = x_center + radius * cos(angle * M_PI / 180);
-					int y1 = y_center + radius * sin(angle * M_PI / 180);
-
-					// Рисуем линию от предыдущей точки к текущей
-					if (angle > 0) {
-						int x0 = x_center + radius * cos((angle - 1) * M_PI / 180);
-						int y0 = y_center + radius * sin((angle - 1) * M_PI / 180);
-						DrawCustomLine(x0, y0, x1, y1, (TrackBar1->Position+1)*2);
-            		}
-				}
-
-        cnt++;
+				int startAngle = 0; // Угол начала (например, 0 градусов)
+				int endAngle = 180;
+                DrawCustomEllipse(x_center, y_center, radius, startAngle, endAngle, ComboBox1->ItemIndex);
+				//PaintBox1->Canvas->Ellipse(x_center - radius, y_center - radius, x_center + radius, y_center + radius);
+		cnt++;
 		first_point = false;
 			}
 		}
@@ -864,13 +984,28 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 				points[cnt] = Point(X, Y);
 				cnt++;
 				PaintBox1->Canvas->Ellipse(x3 - 2, y3 - 2, x3 + 2, y3 + 2);
-				for (u = 0.0; u <= 1.0; u +=step) {
-					/*безье*/
+			   /*	for (u = 0.0; u <= 1.0; u +=step) {
 					int x=(1-u)*(1-u)*(1-u)*x1+3*(1-u)*(1-u)*u*x2+3*u*u*(1-u)*x2+u*u*u*x3;
 					int y=(1-u)*(1-u)*(1-u)*y1+3*(1-u)*(1-u)*u*y2+3*u*u*(1-u)*y2 +u*u*u*y3;
-					PaintBox1->Canvas->Ellipse(x - 2, y - 2, x + 2, y+ 2);
+					//PaintBox1->Canvas->Ellipse(x - 2, y - 2, x + 2, y+ 2);
+					DrawCustomEllipse(x_center, y_center, radius, startAngle, endAngle, ComboBox1->ItemIndex);
+				} */
+
+				// Вычисляем радиус
+				float radius = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+
+				// Вычисляем углы
+				float startAngle = atan2(y1 - y2, x1 - x2) * 180 / M_PI; // Угол от второй точки к первой
+				float endAngle = atan2(y3 - y2, x3 - x2) * 180 / M_PI; // Угол от второй точки к третьей
+
+				// Убедитесь, что endAngle больше startAngle
+				if (endAngle < startAngle) {
+					endAngle += 360; // Добавляем 360 градусов, если нужно
 				}
-				num=0;
+
+				// Рисуем дугу
+				DrawCustomEllipse(x2, y2, radius, startAngle, endAngle, ComboBox1->ItemIndex);
+				num = 0; // Сбросим номер для следующего рисования
 			}
 		}
 		else if (flag==4){
@@ -886,10 +1021,10 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 			}
 			else{
 				points[cnt] = Point(X, Y);
-				DrawCustomLine(x_rec, y_rec,  x_rec, Y, (TrackBar1->Position+1));
-				DrawCustomLine(x_rec, Y, X, Y, (TrackBar1->Position+1));
-				DrawCustomLine(X, Y, X, y_rec, (TrackBar1->Position+1));
-				DrawCustomLine(X, y_rec, x_rec, y_rec, (TrackBar1->Position+1));
+				DrawCustomLine(x_rec, y_rec,  x_rec, Y, ComboBox1->ItemIndex);
+				DrawCustomLine(x_rec, Y, X, Y, ComboBox1->ItemIndex);
+				DrawCustomLine(X, Y, X, y_rec, ComboBox1->ItemIndex);
+				DrawCustomLine(X, y_rec, x_rec, y_rec, ComboBox1->ItemIndex);
 				cnt++;
                 first_point=false;
 			}
@@ -909,7 +1044,7 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 			if(flag==5){
 				points[cnt] = Point(X, Y);
 				//PaintBox1->Canvas->MoveTo(lastPoint.X, lastPoint.Y);
-				DrawCustomLine(lastPoint.X, lastPoint.Y, X, Y, (TrackBar1->Position+1));
+				DrawCustomLine(lastPoint.X, lastPoint.Y, X, Y, ComboBox1->ItemIndex);
 				lastPoint.X=X;
 				lastPoint.Y=Y;
 				cnt++;
@@ -936,12 +1071,25 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 				points[cnt] = Point(X, Y);
 				cnt++;
 				PaintBox1->Canvas->Ellipse(x3 - 2, y3 - 2, x3 + 2, y3 + 2);
-				for (u = 0.0; u <= 1.0; u +=step) {
-					/*безье*/
+				/*for (u = 0.0; u <= 1.0; u +=step) {
 					int x=(1-u)*(1-u)*(1-u)*lastPoint.X+3*(1-u)*(1-u)*u*x2+3*u*u*(1-u)*x2+u*u*u*x3;
 					int y=(1-u)*(1-u)*(1-u)*lastPoint.Y+3*(1-u)*(1-u)*u*y2+3*u*u*(1-u)*y2 +u*u*u*y3;
 					PaintBox1->Canvas->Ellipse(x - 2, y - 2, x + 2, y+ 2);
+				}*/
+                // Вычисляем радиус
+				float radius = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+
+				// Вычисляем углы
+				float startAngle = atan2(y1 - y2, x1 - x2) * 180 / M_PI; // Угол от второй точки к первой
+				float endAngle = atan2(y3 - y2, x3 - x2) * 180 / M_PI; // Угол от второй точки к третьей
+
+				// Убедитесь, что endAngle больше startAngle
+				if (endAngle < startAngle) {
+					endAngle += 360; // Добавляем 360 градусов, если нужно
 				}
+
+				// Рисуем дугу
+				DrawCustomEllipse(x2, y2, radius, startAngle, endAngle, ComboBox1->ItemIndex);
                 lastPoint.X = X;
 				lastPoint.Y = Y;
 				num=1;

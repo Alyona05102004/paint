@@ -45,7 +45,8 @@ __published:	// IDE-managed Components
 	void __fastcall FormCreate(TObject *Sender);
 
 private:	// User declarations
- void __fastcall TForm1::DrawCustomLine(int x1, int y1, int x2, int y2);
+ void __fastcall TForm1::DrawCustomLine(int x1, int y1, int x2, int y2, int pattern);
+ void __fastcall TForm1::DrawCustomEllipse(int xc, int yc, int r, float startAngle, float endAngle, int pattern);
 
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
