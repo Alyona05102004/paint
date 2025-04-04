@@ -59,7 +59,8 @@ private:	// User declarations
     HPEN Pen9;
     HPEN Pen10;
 	HPEN Pen11;
-    HPEN Pen12;
+	HPEN Pen12;
+    TBitmap *DrawingBitmap;
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
     __fastcall ~TForm1();

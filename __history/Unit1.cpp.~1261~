@@ -33,7 +33,12 @@ int cnt=0;
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
-{ CreatePens();
+{ 	CreatePens();
+	DrawingBitmap = new TBitmap(); // Инициализация битмапа
+    DrawingBitmap->Width = PaintBox1->Width;
+    DrawingBitmap->Height = PaintBox1->Height;
+    DrawingBitmap->Canvas->Brush->Color = clBtnFace; // Устанавливаем цвет фона
+	DrawingBitmap->Canvas->FillRect(Rect(0, 0, DrawingBitmap->Width, DrawingBitmap->Height)); // Заполняем фон
 }
 
 void __fastcall TForm1::CreatePens() {
@@ -84,19 +89,11 @@ void __fastcall TForm1::CreatePens() {
 void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
 		  int X, int Y)
 {   // Получаем DC для PaintBox
-	HDC hdc = GetDC(PaintBox1->Parent->Handle);
+	HDC hdc = DrawingBitmap->Canvas->Handle;
 
 	HPEN oldPen;
-
-    // Устанавливаем цвет пера и кисти
-	LOGBRUSH logBrush;
-	logBrush.lbStyle = BS_SOLID; // Стиль кисти
-	logBrush.lbColor = ColorBox1->Selected; // Цвет кисти
-	logBrush.lbHatch = 0; // Не используется
-
 	// Redraw Pens on any of these events
 	CreatePens();
-    PaintBox1->Repaint();
 	switch (ComboBox1->ItemIndex) {
 		case 0:
 			oldPen = (HPEN)SelectObject(hdc, Pen1);
@@ -285,9 +282,9 @@ if (draw==true) {
             }
             }
         }
-    }
+	}
+	PaintBox1->Canvas->Draw(0, 0, DrawingBitmap);
 	SelectObject(hdc, oldPen);
-	ReleaseDC(PaintBox1->Parent->Handle, hdc);
 }
 //---------------------------------------------------------------------------
 
@@ -486,6 +483,7 @@ PaintBox1->Canvas->Pen->Color = clBtnFace;
 		PaintBox1->Canvas->Ellipse(X - 10, Y - 10, X + 10, Y + 10); // Пример стирания
         return;
 }
+PaintBox1->Canvas->Draw(0, 0, DrawingBitmap);
 }
 //---------------------------------------------------------------------------
 
@@ -516,6 +514,7 @@ __fastcall TForm1::~TForm1() {
 	DeleteObject(Pen10);
 	DeleteObject(Pen11);
 	DeleteObject(Pen12);
+    delete DrawingBitmap;
 }
 void __fastcall TForm1::TrackBar1Change(TObject *Sender)
 {
@@ -523,4 +522,11 @@ void __fastcall TForm1::TrackBar1Change(TObject *Sender)
    PaintBox1->Repaint(); // Перерисовываем PaintBox
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TForm1::ColorBox1Change(TObject *Sender)
+{ CreatePens(); // Пересоздаем кисти при изменении цвета пера
+	PaintBox1->Repaint(); // Перерисовываем PaintBox
+}
+//---------------------------------------------------------------------------
+
 

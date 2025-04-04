@@ -33,38 +33,12 @@ int cnt=0;
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
-{ CreatePens();
-
-
-DWORD penWidth= TrackBar1->Position+1;
-    LOGBRUSH logBrush;
-	logBrush.lbStyle = BS_SOLID; // Стиль кисти
-	logBrush.lbColor = ColorBox1->Selected; // Цвет кисти
-	logBrush.lbHatch = 0; // Не используется
-
-    // Создаем массивы для стилей
-    DWORD dashStyle1[] = { 5, 2, 5, 2, 1 };
-    DWORD dashStyle2[] = { 1, 2, 1, 2, 5 };
-    DWORD dashStyle3[] = { 10, 2, 5 };
-    DWORD dashStyle4[] = { 10, 2, 1, 2, 5, 2, 1 };
-    DWORD dashStyle5[] = { 1, 2, 10, 2, 1, 2, 1, 2, 5 };
-    DWORD dashStyle6[] = { 1, 2, 1, 2, 1, 2, 5, 2, 5 };
-    DWORD dashStyle7[] = { 5, 2, 1, 2, 5, 2, 10, 2 };
-	DWORD dashStyle8[] = { 5, 2, 1, 2, 5, 2, 1, 10, 2, 1 };
-
-	this->Pen1 = ExtCreatePen(PS_SOLID, penWidth, &logBrush, 0, nullptr);
-	this->Pen2 = ExtCreatePen(PS_DASH, penWidth, &logBrush, 0, nullptr);
-	this->Pen3 = ExtCreatePen(PS_DOT, penWidth, &logBrush, 0, nullptr);
-	this->Pen4 = ExtCreatePen(PS_DASHDOT, penWidth, &logBrush, 0, nullptr);
-	this->Pen5 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 5, dashStyle1);
-	this->Pen6 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 5, dashStyle2);
-	this->Pen7 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 3, dashStyle3);
-	this->Pen8 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 7, dashStyle4);
-	this->Pen9 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 9, dashStyle5);
-	this->Pen10 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 9, dashStyle6);
-	this->Pen11 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 8, dashStyle7);
-	this->Pen12 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 10, dashStyle8);
-
+{ 	CreatePens();
+	DrawingBitmap = new TBitmap(); // Инициализация битмапа
+    DrawingBitmap->Width = PaintBox1->Width;
+    DrawingBitmap->Height = PaintBox1->Height;
+    DrawingBitmap->Canvas->Brush->Color = clBtnFace; // Устанавливаем цвет фона
+	DrawingBitmap->Canvas->FillRect(Rect(0, 0, DrawingBitmap->Width, DrawingBitmap->Height)); // Заполняем фон
 }
 
 void __fastcall TForm1::CreatePens() {
@@ -115,16 +89,9 @@ void __fastcall TForm1::CreatePens() {
 void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
 		  int X, int Y)
 {   // Получаем DC для PaintBox
-	HDC hdc = GetDC(PaintBox1->Parent->Handle);
+	HDC hdc = DrawingBitmap->Canvas->Handle;
 
 	HPEN oldPen;
-
-    // Устанавливаем цвет пера и кисти
-	LOGBRUSH logBrush;
-	logBrush.lbStyle = BS_SOLID; // Стиль кисти
-	logBrush.lbColor = ColorBox1->Selected; // Цвет кисти
-	logBrush.lbHatch = 0; // Не используется
-
 	// Redraw Pens on any of these events
 	CreatePens();
 	switch (ComboBox1->ItemIndex) {
@@ -315,9 +282,9 @@ if (draw==true) {
             }
             }
         }
-    }
+	}
+	PaintBox1->Canvas->Draw(0, 0, DrawingBitmap);
 	SelectObject(hdc, oldPen);
-	ReleaseDC(PaintBox1->Parent->Handle, hdc);
 }
 //---------------------------------------------------------------------------
 
@@ -516,6 +483,7 @@ PaintBox1->Canvas->Pen->Color = clBtnFace;
 		PaintBox1->Canvas->Ellipse(X - 10, Y - 10, X + 10, Y + 10); // Пример стирания
         return;
 }
+PaintBox1->Canvas->Draw(0, 0, DrawingBitmap);
 }
 //---------------------------------------------------------------------------
 
@@ -546,4 +514,19 @@ __fastcall TForm1::~TForm1() {
 	DeleteObject(Pen10);
 	DeleteObject(Pen11);
 	DeleteObject(Pen12);
+    delete DrawingBitmap;
 }
+void __fastcall TForm1::TrackBar1Change(TObject *Sender)
+{
+   CreatePens(); // Пересоздаем кисти при изменении ширины пера
+   PaintBox1->Repaint(); // Перерисовываем PaintBox
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::ColorBox1Change(TObject *Sender)
+{ CreatePens(); // Пересоздаем кисти при изменении цвета пера
+	PaintBox1->Repaint(); // Перерисовываем PaintBox
+}
+//---------------------------------------------------------------------------
+
+

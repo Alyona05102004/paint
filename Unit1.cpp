@@ -8,7 +8,6 @@
 #include <Vcl.Dialogs.hpp>
 #include <windows.h>
 #include <cmath>
-#include <vector>
 #pragma hdrstop
 
 #include "Unit1.h"
@@ -33,7 +32,12 @@ int cnt=0;
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
-{ CreatePens();
+{ 	CreatePens();
+    DrawingBitmap = new TBitmap(); // Инициализация битмапа
+    DrawingBitmap->Width = PaintBox1->Width;
+    DrawingBitmap->Height = PaintBox1->Height;
+    DrawingBitmap->Canvas->Brush->Color = clBtnFace; // Устанавливаем цвет фона
+    DrawingBitmap->Canvas->FillRect(Rect(0, 0, DrawingBitmap->Width, DrawingBitmap->Height));
 }
 
 void __fastcall TForm1::CreatePens() {
@@ -53,18 +57,18 @@ void __fastcall TForm1::CreatePens() {
     DWORD dashStyle7[] = { 5, 2, 1, 2, 5, 2, 10, 2 };
 	DWORD dashStyle8[] = { 5, 2, 1, 2, 5, 2, 1, 10, 2, 1 };
 
-	DeleteObject(Pen1);
-	DeleteObject(Pen2);
-    DeleteObject(Pen3);
-	DeleteObject(Pen4);
-	DeleteObject(Pen5);
-	DeleteObject(Pen6);
-	DeleteObject(Pen7);
-	DeleteObject(Pen8);
-	DeleteObject(Pen9);
-	DeleteObject(Pen10);
-	DeleteObject(Pen11);
-	DeleteObject(Pen12);
+	if(Pen1) DeleteObject(Pen1);
+	if(Pen2) DeleteObject(Pen2);
+    if(Pen3) DeleteObject(Pen3);
+	if(Pen4) DeleteObject(Pen4);
+	if(Pen5) DeleteObject(Pen5);
+	if(Pen6) DeleteObject(Pen6);
+	if(Pen7) DeleteObject(Pen7);
+	if(Pen8) DeleteObject(Pen8);
+	if(Pen9) DeleteObject(Pen9);
+	if(Pen10) DeleteObject(Pen10);
+	if(Pen11) DeleteObject(Pen11);
+	if(Pen12) DeleteObject(Pen12);
 
     Pen1 = ExtCreatePen(PS_SOLID, penWidth, &logBrush, 0, nullptr);
     Pen2 = ExtCreatePen(PS_DASH, penWidth, &logBrush, 0, nullptr);
@@ -84,19 +88,11 @@ void __fastcall TForm1::CreatePens() {
 void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
 		  int X, int Y)
 {   // Получаем DC для PaintBox
-	HDC hdc = GetDC(PaintBox1->Parent->Handle);
+	HDC hdc = DrawingBitmap->Canvas->Handle;
 
 	HPEN oldPen;
-
-    // Устанавливаем цвет пера и кисти
-	LOGBRUSH logBrush;
-	logBrush.lbStyle = BS_SOLID; // Стиль кисти
-	logBrush.lbColor = ColorBox1->Selected; // Цвет кисти
-	logBrush.lbHatch = 0; // Не используется
-
 	// Redraw Pens on any of these events
 	CreatePens();
-    PaintBox1->Repaint();
 	switch (ComboBox1->ItemIndex) {
 		case 0:
 			oldPen = (HPEN)SelectObject(hdc, Pen1);
@@ -133,6 +129,9 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 			break;
 		case 11:
 			oldPen = (HPEN)SelectObject(hdc, Pen12);
+			break;
+		default:
+            oldPen = (HPEN)SelectObject(hdc, Pen1); // Default pen
 			break;
 	}
 
@@ -285,9 +284,10 @@ if (draw==true) {
             }
             }
         }
-    }
+	}
 	SelectObject(hdc, oldPen);
-	ReleaseDC(PaintBox1->Parent->Handle, hdc);
+	PaintBox1->Canvas->Draw(0, 0, DrawingBitmap);
+    PaintBox1->Repaint();
 }
 //---------------------------------------------------------------------------
 
@@ -486,6 +486,7 @@ PaintBox1->Canvas->Pen->Color = clBtnFace;
 		PaintBox1->Canvas->Ellipse(X - 10, Y - 10, X + 10, Y + 10); // Пример стирания
         return;
 }
+PaintBox1->Canvas->Draw(0, 0, DrawingBitmap);
 }
 //---------------------------------------------------------------------------
 
@@ -504,18 +505,19 @@ void __fastcall TForm1::FormCreate(TObject *Sender)
 //---------------------------------------------------------------------------
 
 __fastcall TForm1::~TForm1() {
-	DeleteObject(Pen1);
-	DeleteObject(Pen2);
-    DeleteObject(Pen3);
-	DeleteObject(Pen4);
-	DeleteObject(Pen5);
-	DeleteObject(Pen6);
-	DeleteObject(Pen7);
-	DeleteObject(Pen8);
-	DeleteObject(Pen9);
-	DeleteObject(Pen10);
-	DeleteObject(Pen11);
-	DeleteObject(Pen12);
+	if(Pen1) DeleteObject(Pen1);
+    if(Pen2) DeleteObject(Pen2);
+    if(Pen3) DeleteObject(Pen3);
+    if(Pen4) DeleteObject(Pen4);
+    if(Pen5) DeleteObject(Pen5);
+    if(Pen6) DeleteObject(Pen6);
+    if(Pen7) DeleteObject(Pen7);
+    if(Pen8) DeleteObject(Pen8);
+    if(Pen9) DeleteObject(Pen9);
+    if(Pen10) DeleteObject(Pen10);
+    if(Pen11) DeleteObject(Pen11);
+    if(Pen12) DeleteObject(Pen12);
+    delete DrawingBitmap;
 }
 void __fastcall TForm1::TrackBar1Change(TObject *Sender)
 {
