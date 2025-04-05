@@ -33,69 +33,70 @@ int cnt=0;
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
-{ 	CreatePens();
-    DrawingBitmap = new TBitmap(); // Инициализация битмапа
-    DrawingBitmap->Width = PaintBox1->Width;
-    DrawingBitmap->Height = PaintBox1->Height;
-    DrawingBitmap->Canvas->Brush->Color = clBtnFace; // Устанавливаем цвет фона
-    DrawingBitmap->Canvas->FillRect(Rect(0, 0, DrawingBitmap->Width, DrawingBitmap->Height));
+{ CreatePens();
 }
 
 void __fastcall TForm1::CreatePens() {
-    DWORD penWidth= TrackBar1->Position+1;
+	DWORD penWidth= TrackBar1->Position+1;
+	unsigned int propusk= TrackBar1->Position+1;
     LOGBRUSH logBrush;
     logBrush.lbStyle = BS_SOLID; // Стиль кисти
     logBrush.lbColor = ColorBox1->Selected; // Цвет кисти
     logBrush.lbHatch = 0; // Не используется
 
     // Создаем массивы для стилей
-    DWORD dashStyle1[] = { 5, 2, 5, 2, 1 };
-    DWORD dashStyle2[] = { 1, 2, 1, 2, 5 };
-    DWORD dashStyle3[] = { 10, 2, 5 };
-    DWORD dashStyle4[] = { 10, 2, 1, 2, 5, 2, 1 };
-    DWORD dashStyle5[] = { 1, 2, 10, 2, 1, 2, 1, 2, 5 };
-    DWORD dashStyle6[] = { 1, 2, 1, 2, 1, 2, 5, 2, 5 };
-    DWORD dashStyle7[] = { 5, 2, 1, 2, 5, 2, 10, 2 };
-	DWORD dashStyle8[] = { 5, 2, 1, 2, 5, 2, 1, 10, 2, 1 };
+    DWORD dashStyle1[] = { 5+propusk, 2+propusk, 5+propusk, 2+propusk, 1, 2+propusk };
+	DWORD dashStyle2[] = { 1, 2+propusk, 1, 2+propusk, 5+propusk, 2+propusk };
+    DWORD dashStyle3[] = { 10+propusk, 2+propusk, 5+propusk, 2+propusk };
+	DWORD dashStyle4[] = { 10+propusk, 2+propusk, 1, 2+propusk, 5+propusk, 2+propusk, 1, 2+propusk };
+	DWORD dashStyle5[] = { 1, 2+propusk, 10+propusk, 2+propusk, 1, 2+propusk, 1, 2+propusk, 5, 2+propusk };
+	DWORD dashStyle6[] = { 1, 2+propusk, 1, 2+propusk, 1, 2+propusk, 5+propusk, 2+propusk, 5+propusk, 2+propusk };
+	DWORD dashStyle7[] = { 5+propusk, 2+propusk, 1, 2+propusk, 5+propusk, 2+propusk, 10+propusk, 2+propusk };
+	DWORD dashStyle8[] = { 5+propusk, 2+propusk, 1, 2+propusk, 5+propusk, 2+propusk, 1, 10+propusk, 2+propusk, 1, 2+propusk};
 
-	if(Pen1) DeleteObject(Pen1);
-	if(Pen2) DeleteObject(Pen2);
-    if(Pen3) DeleteObject(Pen3);
-	if(Pen4) DeleteObject(Pen4);
-	if(Pen5) DeleteObject(Pen5);
-	if(Pen6) DeleteObject(Pen6);
-	if(Pen7) DeleteObject(Pen7);
-	if(Pen8) DeleteObject(Pen8);
-	if(Pen9) DeleteObject(Pen9);
-	if(Pen10) DeleteObject(Pen10);
-	if(Pen11) DeleteObject(Pen11);
-	if(Pen12) DeleteObject(Pen12);
+	DeleteObject(Pen1);
+	DeleteObject(Pen2);
+    DeleteObject(Pen3);
+	DeleteObject(Pen4);
+	DeleteObject(Pen5);
+	DeleteObject(Pen6);
+	DeleteObject(Pen7);
+	DeleteObject(Pen8);
+	DeleteObject(Pen9);
+	DeleteObject(Pen10);
+	DeleteObject(Pen11);
+	DeleteObject(Pen12);
 
-    Pen1 = ExtCreatePen(PS_SOLID, penWidth, &logBrush, 0, nullptr);
-    Pen2 = ExtCreatePen(PS_DASH, penWidth, &logBrush, 0, nullptr);
-    Pen3 = ExtCreatePen(PS_DOT, penWidth, &logBrush, 0, nullptr);
-    Pen4 = ExtCreatePen(PS_DASHDOT, penWidth, &logBrush, 0, nullptr);
-    Pen5 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 5, dashStyle1);
-    Pen6 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 5, dashStyle2);
-    Pen7 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 3, dashStyle3);
-    Pen8 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 7, dashStyle4);
-    Pen9 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 9, dashStyle5);
-    Pen10 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 9, dashStyle6);
-    Pen11 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 8, dashStyle7);
-    Pen12 = ExtCreatePen(PS_USERSTYLE, penWidth, &logBrush, 10, dashStyle8);
+	Pen1 = ExtCreatePen(PS_GEOMETRIC | PS_SOLID, penWidth, &logBrush, 0, nullptr);
+	Pen2 = ExtCreatePen(PS_GEOMETRIC | PS_DASH, penWidth, &logBrush, 0, nullptr);
+	Pen3 = ExtCreatePen(PS_GEOMETRIC | PS_DASHDOT, penWidth, &logBrush, 0, nullptr);
+	Pen4 = ExtCreatePen(PS_GEOMETRIC | PS_DOT, penWidth, &logBrush, 0, nullptr);
+	Pen5 = ExtCreatePen(PS_GEOMETRIC | PS_USERSTYLE, penWidth, &logBrush, 6, dashStyle1);
+	Pen6 = ExtCreatePen(PS_GEOMETRIC | PS_USERSTYLE, penWidth, &logBrush, 6, dashStyle2);
+	Pen7 = ExtCreatePen(PS_GEOMETRIC | PS_USERSTYLE, penWidth, &logBrush, 4, dashStyle3);
+	Pen8 = ExtCreatePen(PS_GEOMETRIC | PS_USERSTYLE, penWidth, &logBrush, 8, dashStyle4);
+	Pen9 = ExtCreatePen(PS_GEOMETRIC | PS_USERSTYLE, penWidth, &logBrush, 10, dashStyle5);
+	Pen10 = ExtCreatePen(PS_GEOMETRIC | PS_USERSTYLE, penWidth, &logBrush, 10, dashStyle6);
+	Pen11 = ExtCreatePen(PS_GEOMETRIC | PS_USERSTYLE, penWidth, &logBrush, 8, dashStyle7);
+	Pen12 = ExtCreatePen(PS_GEOMETRIC | PS_USERSTYLE, penWidth, &logBrush, 11, dashStyle8);
 }
 
 
 void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
 		  int X, int Y)
-{   CreatePens(); // Redraw Pens on any of these events
-    HPEN oldPen;
+{   // Получаем DC для PaintBox
+	HDC hdc = GetDC(PaintBox1->Parent->Handle);
 
-	// Set pen properties
-	DrawingBitmap->Canvas->Pen->Color = ColorBox1->Selected;
-	DrawingBitmap->Canvas->Pen->Width = TrackBar1->Position+1;
+	HPEN oldPen;
+	HBRUSH oldBrush;
+    HBRUSH hBrush = CreateSolidBrush(ColorBox2->Selected);
+    oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 
-	switch (ComboBox1->ItemIndex) {
+	LOGBRUSH logBrush;
+	logBrush.lbStyle = BS_SOLID; // Стиль кисти
+	logBrush.lbColor = ColorBox1->Selected; // Цвет кисти
+	logBrush.lbHatch = 0; // Не используется
+	CreatePens();
 		case 0:
 			oldPen = (HPEN)SelectObject(hdc, Pen1);
 			break;
@@ -132,9 +133,6 @@ void __fastcall TForm1::PaintBox1MouseDown(TObject *Sender, TMouseButton Button,
 		case 11:
 			oldPen = (HPEN)SelectObject(hdc, Pen12);
 			break;
-		default:
-            oldPen = (HPEN)SelectObject(hdc, Pen1); // Default pen
-			break;
 	}
 
 if (draw==true) {
@@ -152,8 +150,8 @@ if (draw==true) {
             }
             else{
                 points[cnt] = Point(X, Y);
-                MoveToEx(hdc, points[cnt-1].X, points[cnt-1].Y, nullptr); // Перемещаем перо к предыдущей точке
-                LineTo(hdc, points[cnt].X, points[cnt].Y); // Рисуем линию к текущей точке
+				MoveToEx(hdc, points[cnt-1].X, points[cnt-1].Y, nullptr); // Перемещаем перо к предыдущей точке
+				LineTo(hdc, points[cnt].X, points[cnt].Y); // Рисуем линию к текущей точке
                 cnt++;
                 first_point=false;
             }
@@ -169,7 +167,7 @@ if (draw==true) {
                 first_point=true;
                 }
             else{
-                int radius = (sqrt(pow(x_center - X, 2) + pow(y_center - Y, 2)));
+				int radius = (sqrt(pow(x_center - X, 2) + pow(y_center - Y, 2)));
                 Ellipse(hdc, x_center - radius, y_center - radius, x_center + radius, y_center + radius);
                 cnt++;
                 first_point = false;
@@ -179,7 +177,7 @@ if (draw==true) {
         //дуга
             static int x1 = 0, y1 = 0;
             static int x2 = 0, y2 = 0;
-            static float step = 0.001;
+            static float step = 0.01;
             static float u=0.0l;
             static int num=0;
             if (num == 0) {
@@ -206,13 +204,16 @@ if (draw==true) {
                 int y3 = Y;
                 points[cnt] = Point(X, Y);
                 cnt++;
-                Ellipse(hdc, x3 - 2, y3 - 2, x3 + 2, y3 + 2);
-                for (u = 0.0; u <= 1.0; u +=step) {
-                    int x=(1-u)*(1-u)*(1-u)*x1+3*(1-u)*(1-u)*u*x2+3*u*u*(1-u)*x2+u*u*u*x3;
-                    int y=(1-u)*(1-u)*(1-u)*y1+3*(1-u)*(1-u)*u*y2+3*u*u*(1-u)*y2 +u*u*u*y3;
-                    Ellipse(hdc, x - 2, y - 2, x + 2, y+ 2);
-                }
-                num = 0; // Сбросим номер для следующего рисования
+				Ellipse(hdc, x3 - 2, y3 - 2, x3 + 2, y3 + 2);
+                POINT bezierPoints[4];
+				bezierPoints[0] = { x1, y1 }; // Начальная точка
+				bezierPoints[1] = { x2, y2 }; // Контрольная точка 1
+				bezierPoints[2] = { x2, y2 }; // Контрольная точка 2
+				bezierPoints[3] = { x3, y3 }; // Конечная точка
+
+				// Рисуем кривую Безье
+				PolyBezier(hdc, bezierPoints, 4);
+				num = 0; // Сбросим номер для следующего рисования
             }
         }
         else if (flag==4){
@@ -234,10 +235,9 @@ if (draw==true) {
             }
         }
     }
-
-
     if (draw_polyline==true) {
-        if (!poly_first_point)
+       PaintBox1->Canvas->Brush->Color=clBtnFace;
+		if (!poly_first_point)
         {
             // Начало полилинии
             poly_first_point = true;
@@ -256,8 +256,8 @@ if (draw==true) {
             if(flag==6){
             static int x1 = 0, y1 = 0;
             static int x2 = 0, y2 = 0;
-            static float step = 0.001;
-            static float u=0.0l;
+            static float step = 0.01;
+			static float u=0.0l;
             static int num=1;
             if (num == 1) {
                 // Вторая точка
@@ -274,60 +274,64 @@ if (draw==true) {
                 int y3 = Y;
                 points[cnt] = Point(X, Y);
                 cnt++;
-                Ellipse(hdc, x3 - 2, y3 - 2, x3 + 2, y3 + 2);
-                for (u = 0.0; u <= 1.0; u +=step) {
-                    int x=(1-u)*(1-u)*(1-u)*lastPoint.X+3*(1-u)*(1-u)*u*x2+3*u*u*(1-u)*x2+u*u*u*x3;
-                    int y=(1-u)*(1-u)*(1-u)*lastPoint.Y+3*(1-u)*(1-u)*u*y2+3*u*u*(1-u)*y2 +u*u*u*y3;
-                    Ellipse(hdc, x - 2, y - 2, x + 2, y+ 2);
-                }
-                lastPoint.X = X;
+				Ellipse(hdc, x3 - 2, y3 - 2, x3 + 2, y3 + 2);
+                POINT bezierPoints[4];
+				bezierPoints[0] = { lastPoint.X, lastPoint.Y }; // Начальная точка
+				bezierPoints[1] = { x2, y2 }; // Контрольная точка 1
+				bezierPoints[2] = { x2, y2 }; // Контрольная точка 2 (можно изменить для более сложной кривой)
+				bezierPoints[3] = { x3, y3 }; // Конечная точка
+
+				// Рисуем кривую Безье
+				PolyBezier(hdc, bezierPoints, 4);
+				lastPoint.X = X;
                 lastPoint.Y = Y;
                 num=1;
             }
             }
         }
-	}
+    }
 	SelectObject(hdc, oldPen);
-    PaintBox1->Canvas->Draw(0, 0, DrawingBitmap);
+	ReleaseDC(PaintBox1->Parent->Handle, hdc);
 }
 //---------------------------------------------------------------------------
 
 
 void __fastcall TForm1::RadioGroup1Click(TObject *Sender)
-{ flag=-1;
+{
+	flag=-1;
 	first_point=false;
 	poly_first_point=false;
 	RadioGroup2->ItemIndex=-1;
- if (draw==true) {
-	if (RadioGroup1->ItemIndex==0) {
-	//точка
-	flag=0;
-	}
-	else if (RadioGroup1->ItemIndex==1){
-	//отрезок
-	flag=1;
-	}
-	else if (RadioGroup1->ItemIndex==2){
-	//окружность
-	flag=2;
-	}
-	else if (RadioGroup1->ItemIndex==3){
-	//дуга
-	flag=3;
-	}
-	else{
-	//прямоугольник
-	flag=4;
-	}
-  }
-
+	if (draw==true) {
+		if (RadioGroup1->ItemIndex==0) {
+			//точка
+			flag=0;
+		}
+		else if (RadioGroup1->ItemIndex==1){
+			//отрезок
+			flag=1;
+		}
+		else if (RadioGroup1->ItemIndex==2){
+			//окружность
+			flag=2;
+		}
+		else if (RadioGroup1->ItemIndex==3){
+			//дуга
+			flag=3;
+		}
+		else{
+			//прямоугольник
+			flag=4;
+		}
+  	}
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::RadioGroup2Click(TObject *Sender)
-{ flag=-1;
-first_point=false;
-RadioGroup1->ItemIndex=-1;
+{
+	flag=-1;
+	first_point=false;
+	RadioGroup1->ItemIndex=-1;
 	if (draw_polyline==true) {
 		if (RadioGroup2->ItemIndex==0){
 		//отрезок
@@ -337,18 +341,18 @@ RadioGroup1->ItemIndex=-1;
 		//дуга
 			flag=6;
 		}
-  }
-
+	}
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::Button1Click(TObject *Sender)
-{draw_polyline=false;
-draw=true;
-RadioGroup1->Enabled=true;
-RadioGroup2->Enabled=false;
-RadioGroup2->ItemIndex=-1;
-lastik=false;
+{	draw_polyline=false;
+	draw=true;
+	RadioGroup1->Enabled=true;
+	flag=0;
+	RadioGroup2->Enabled=false;
+	RadioGroup2->ItemIndex=-1;
+	lastik=false;
 }
 //---------------------------------------------------------------------------
 
@@ -364,19 +368,17 @@ void __fastcall TForm1::Button5Click(TObject *Sender)
 
 void __fastcall TForm1::Button2Click(TObject *Sender)
 {
-lastik=true;
-draw=false;
-draw_polyline=false;
-RadioGroup1->Enabled=false;
-RadioGroup2->Enabled=false;
+	lastik=true;
+	draw=false;
+	draw_polyline=false;
+	RadioGroup1->Enabled=false;
+	RadioGroup2->Enabled=false;
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::Button3Click(TObject *Sender)
 {   //сохранить
- TBitmap *bmp = new TBitmap();
-	//TSaveDialog *saveDialog = new TSaveDialog(this); // Создаем SaveDialog
-
+ 	TBitmap *bmp = new TBitmap();
     try {
 
 		SaveDialog1->Title = "Сохранить изображение";
@@ -419,16 +421,13 @@ void __fastcall TForm1::Button3Click(TObject *Sender)
 	} catch (...) {
 		ShowMessage("Ошибка при сохранении изображения!");
 	}
-
 	delete bmp;
-
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::Button4Click(TObject *Sender)
 {
 //открыть
-//TOpenDialog *openDialog = new TOpenDialog(this); // Создаем OpenDialog
 	TBitmap *bmp = new TBitmap(); // Создаем TBitmap
 
 	try {
@@ -471,33 +470,25 @@ void __fastcall TForm1::Button4Click(TObject *Sender)
     } catch (...) {
         ShowMessage("Ошибка при открытии изображения!");
     }
-
-   // delete openDialog; // Освобождаем память
 	delete bmp; // Освобождаем память
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::PaintBox1MouseMove(TObject *Sender, TShiftState Shift, int X,
 		  int Y)
-{
-
-if (lastik && Shift.Contains(ssLeft)) {
-PaintBox1->Canvas->Pen->Color = clBtnFace;
+{   if (lastik && Shift.Contains(ssLeft)) {
+		PaintBox1->Canvas->Pen->Color = clBtnFace;
 		PaintBox1->Canvas->Brush->Color = clBtnFace;
-		PaintBox1->Canvas->Ellipse(X - 10, Y - 10, X + 10, Y + 10); // Пример стирания
-        return;
-}
-PaintBox1->Canvas->Draw(0, 0, DrawingBitmap);
+		PaintBox1->Canvas->Ellipse(X - 10-(TrackBar1->Position+1), Y - 10-(TrackBar1->Position+1), X + 10+(TrackBar1->Position+1), Y + 10+(TrackBar1->Position+1)); // Пример стирания
+		return;
+	}
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::FormCreate(TObject *Sender)
 {
-    // Установите размеры формы на весь экран
     this->Width = Screen->Width;
     this->Height = Screen->Height;
-
-    // Установите размеры PaintBox1 и GroupBox1
     PaintBox1->Width = ClientWidth - (GroupBox1->Width) - 10;
 	PaintBox1->Height = ClientHeight-10;
     GroupBox1->Left = ClientWidth - (GroupBox1->Width);
@@ -506,30 +497,28 @@ void __fastcall TForm1::FormCreate(TObject *Sender)
 //---------------------------------------------------------------------------
 
 __fastcall TForm1::~TForm1() {
-	if(Pen1) DeleteObject(Pen1);
-    if(Pen2) DeleteObject(Pen2);
-    if(Pen3) DeleteObject(Pen3);
-    if(Pen4) DeleteObject(Pen4);
-    if(Pen5) DeleteObject(Pen5);
-    if(Pen6) DeleteObject(Pen6);
-    if(Pen7) DeleteObject(Pen7);
-    if(Pen8) DeleteObject(Pen8);
-    if(Pen9) DeleteObject(Pen9);
-    if(Pen10) DeleteObject(Pen10);
-    if(Pen11) DeleteObject(Pen11);
-    if(Pen12) DeleteObject(Pen12);
-    delete DrawingBitmap;
+	DeleteObject(Pen1);
+	DeleteObject(Pen2);
+    DeleteObject(Pen3);
+	DeleteObject(Pen4);
+	DeleteObject(Pen5);
+	DeleteObject(Pen6);
+	DeleteObject(Pen7);
+	DeleteObject(Pen8);
+	DeleteObject(Pen9);
+	DeleteObject(Pen10);
+	DeleteObject(Pen11);
+	DeleteObject(Pen12);
 }
 void __fastcall TForm1::TrackBar1Change(TObject *Sender)
 {
-   CreatePens(); // Пересоздаем кисти при изменении ширины пера
-   PaintBox1->Repaint(); // Перерисовываем PaintBox
+	CreatePens(); // Пересоздаем кисти при изменении ширины пера
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::ColorBox1Change(TObject *Sender)
-{ CreatePens(); // Пересоздаем кисти при изменении цвета пера
-	PaintBox1->Repaint(); // Перерисовываем PaintBox
+{
+	CreatePens(); // Пересоздаем кисти при изменении цвета пера
 }
 //---------------------------------------------------------------------------
 
