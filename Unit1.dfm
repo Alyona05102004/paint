@@ -66,6 +66,7 @@ object Form1: TForm1
       Width = 145
       Height = 22
       TabOrder = 1
+      OnChange = ColorBox1Change
     end
     object ColorBox2: TColorBox
       Left = 17
@@ -107,7 +108,7 @@ object Form1: TForm1
       Items.Strings = (
         #1058#1086#1095#1082#1072
         #1054#1090#1088#1077#1079#1086#1082
-        #1054#1088#1082#1091#1078#1085#1086#1089#1090#1100
+        #1054#1082#1088#1091#1078#1085#1086#1089#1090#1100
         #1044#1091#1075#1072
         #1055#1088#1103#1084#1086#1091#1075#1086#1083#1100#1085#1080#1082)
       TabOrder = 4
@@ -122,6 +123,7 @@ object Form1: TForm1
       Min = 1
       Position = 1
       TabOrder = 5
+      OnChange = TrackBar1Change
     end
     object RadioGroup2: TRadioGroup
       Left = 19

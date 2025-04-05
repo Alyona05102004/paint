@@ -43,12 +43,27 @@ __published:	// IDE-managed Components
 	void __fastcall Button4Click(TObject *Sender);
 	void __fastcall PaintBox1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
 	void __fastcall FormCreate(TObject *Sender);
+	void __fastcall TrackBar1Change(TObject *Sender);
+	void __fastcall ColorBox1Change(TObject *Sender);
 
 private:	// User declarations
- void __fastcall TForm1::DrawCustomLine(int x1, int y1, int x2, int y2);
-
+    void __fastcall TForm1::CreatePens();
+	HPEN Pen1;
+    HPEN Pen2;
+    HPEN Pen3;
+    HPEN Pen4;
+    HPEN Pen5;
+    HPEN Pen6;
+    HPEN Pen7;
+    HPEN Pen8;
+    HPEN Pen9;
+    HPEN Pen10;
+	HPEN Pen11;
+    HPEN Pen12;
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
+    __fastcall ~TForm1();
+
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm1 *Form1;
